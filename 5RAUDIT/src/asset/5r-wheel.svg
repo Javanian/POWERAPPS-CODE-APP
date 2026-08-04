@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="5R: Ringkas, Rapi, Resik, Rawat, Rajin">
+<path d="M112.61,14.26 L111.91,4.28 A116,116 0 0 1 128.09,4.28 L127.39,14.26 Z M145.64,17.15 L148.06,7.45 A116,116 0 0 1 163.45,12.45 L159.71,21.72 Z M176.17,30.11 L181.47,21.63 A116,116 0 0 1 194.56,31.14 L188.14,38.80 Z M201.20,51.86 L208.86,45.44 A116,116 0 0 1 218.37,58.53 L209.89,63.83 Z M218.28,80.29 L227.55,76.55 A116,116 0 0 1 232.55,91.94 L222.85,94.36 Z M225.74,112.61 L235.72,111.91 A116,116 0 0 1 235.72,128.09 L225.74,127.39 Z M222.85,145.64 L232.55,148.06 A116,116 0 0 1 227.55,163.45 L218.28,159.71 Z M209.89,176.17 L218.37,181.47 A116,116 0 0 1 208.86,194.56 L201.20,188.14 Z M188.14,201.20 L194.56,208.86 A116,116 0 0 1 181.47,218.37 L176.17,209.89 Z M159.71,218.28 L163.45,227.55 A116,116 0 0 1 148.06,232.55 L145.64,222.85 Z M127.39,225.74 L128.09,235.72 A116,116 0 0 1 111.91,235.72 L112.61,225.74 Z M94.36,222.85 L91.94,232.55 A116,116 0 0 1 76.55,227.55 L80.29,218.28 Z M63.83,209.89 L58.53,218.37 A116,116 0 0 1 45.44,208.86 L51.86,201.20 Z M38.80,188.14 L31.14,194.56 A116,116 0 0 1 21.63,181.47 L30.11,176.17 Z M21.72,159.71 L12.45,163.45 A116,116 0 0 1 7.45,148.06 L17.15,145.64 Z M14.26,127.39 L4.28,128.09 A116,116 0 0 1 4.28,111.91 L14.26,112.61 Z M17.15,94.36 L7.45,91.94 A116,116 0 0 1 12.45,76.55 L21.72,80.29 Z M30.11,63.83 L21.63,58.53 A116,116 0 0 1 31.14,45.44 L38.80,51.86 Z M51.86,38.80 L45.44,31.14 A116,116 0 0 1 58.53,21.63 L63.83,30.11 Z M80.29,21.72 L76.55,12.45 A116,116 0 0 1 91.94,7.45 L94.36,17.15 Z" fill="#cbd2dc"/>
+<circle cx="120" cy="120" r="107" fill="#cbd2dc"/>
+<path d="M123.99,16.08 A104,104 0 0 1 217.60,84.09 L174.43,99.97 A58,58 0 0 0 122.23,62.04 Z" fill="#e03131"/>
+<text x="167.61" y="54.47" fill="#fff" font-family="Inter, Segoe UI, sans-serif" font-size="13" font-weight="700" text-anchor="middle" dominant-baseline="central">Ringkas</text>
+<path d="M220.07,91.68 A104,104 0 0 1 184.31,201.73 L155.87,165.58 A58,58 0 0 0 175.81,104.21 Z" fill="#f08c00"/>
+<text x="197.04" y="145.03" fill="#fff" font-family="Inter, Segoe UI, sans-serif" font-size="13" font-weight="700" text-anchor="middle" dominant-baseline="central">Rapi</text>
+<path d="M177.85,206.42 A104,104 0 0 1 62.15,206.42 L87.73,168.20 A58,58 0 0 0 152.27,168.20 Z" fill="#f5c518"/>
+<text x="120.00" y="201.00" fill="#3b2f00" font-family="Inter, Segoe UI, sans-serif" font-size="13" font-weight="700" text-anchor="middle" dominant-baseline="central">Resik</text>
+<path d="M55.69,201.73 A104,104 0 0 1 19.93,91.68 L64.19,104.21 A58,58 0 0 0 84.13,165.58 Z" fill="#1e7ec8"/>
+<text x="42.96" y="145.03" fill="#fff" font-family="Inter, Segoe UI, sans-serif" font-size="13" font-weight="700" text-anchor="middle" dominant-baseline="central">Rawat</text>
+<path d="M22.40,84.09 A104,104 0 0 1 116.01,16.08 L117.77,62.04 A58,58 0 0 0 65.57,99.97 Z" fill="#2f9e44"/>
+<text x="72.39" y="54.47" fill="#fff" font-family="Inter, Segoe UI, sans-serif" font-size="13" font-weight="700" text-anchor="middle" dominant-baseline="central">Rajin</text>
+<circle cx="120" cy="120" r="52" fill="#ffffff"/>
+<text x="120" y="120" fill="#0f172a" font-family="Inter, Segoe UI, sans-serif" font-size="34" font-weight="800" text-anchor="middle" dominant-baseline="central">5R</text>
+</svg>
