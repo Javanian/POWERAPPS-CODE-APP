@@ -1,0 +1,628 @@
+/* ══════ Audit 5R — form modern, satu bahasa dengan landing page ══════
+   Memakai token tema landing (--lp-*) supaya otomatis light/dark. */
+
+.au-main {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 4px 18px 40px;
+  overflow-y: auto;
+}
+
+/* ── Topbar audit (reuse .lp-topbar dari landing) ── */
+.au-topbar-title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  text-align: center;
+}
+
+.au-topbar-eyebrow {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--lp-muted);
+}
+
+.au-topbar-name {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--lp-text);
+}
+
+.au-iconbtn {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border: 1px solid var(--lp-line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--lp-muted);
+  cursor: pointer;
+  transition: color 0.18s ease-out, border-color 0.18s ease-out, background-color 0.18s ease-out;
+}
+
+.au-iconbtn:hover {
+  color: var(--lp-text);
+  border-color: rgba(147, 164, 181, 0.5);
+  background: rgba(147, 164, 181, 0.12);
+}
+
+.au-iconbtn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(30, 126, 200, 0.5);
+}
+
+/* ── Konteks audit ── */
+.au-context {
+  margin: 10px 2px 18px;
+  animation: lp-rise 0.5s ease-out both;
+}
+
+.au-context-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--lp-muted);
+}
+
+.au-context-line {
+  margin-top: 4px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--lp-muted);
+}
+
+.au-context-line strong {
+  color: var(--lp-text);
+  font-weight: 700;
+}
+
+/* ── Kartu panel dasar ── */
+.au-card {
+  border: 1px solid var(--lp-line);
+  border-radius: 18px;
+  background: var(--lp-panel);
+  box-shadow: 0 6px 22px rgba(8, 15, 30, 0.06);
+  animation: lp-rise 0.5s ease-out both;
+}
+
+.lp-root:not(.lp-light) .au-card {
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.28);
+}
+
+/* ── Menu 5R ── */
+.au-menu-head {
+  display: flex;
+  justify-content: space-between;
+  padding: 16px 18px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--lp-muted);
+  border-bottom: 1px solid var(--lp-line);
+}
+
+.au-menu-list {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+}
+
+.au-cat-row {
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  font-family: inherit;
+  animation: lp-rise 0.5s ease-out both;
+}
+
+.au-cat-row:nth-child(1) { animation-delay: 0.04s; }
+.au-cat-row:nth-child(2) { animation-delay: 0.09s; }
+.au-cat-row:nth-child(3) { animation-delay: 0.14s; }
+.au-cat-row:nth-child(4) { animation-delay: 0.19s; }
+.au-cat-row:nth-child(5) { animation-delay: 0.24s; }
+
+.au-cat-row:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.au-cat-body {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  min-width: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--lp-line);
+  border-left-width: 5px;
+  border-radius: 14px;
+  background: var(--lp-panel);
+  transition: transform 0.16s ease-out, box-shadow 0.16s ease-out, border-color 0.16s ease-out;
+}
+
+.au-cat-row:hover:not(:disabled) .au-cat-body {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(8, 15, 30, 0.1);
+}
+
+.au-cat-row:focus-visible {
+  outline: none;
+}
+
+.au-cat-row:focus-visible .au-cat-body {
+  box-shadow: 0 0 0 3px rgba(30, 126, 200, 0.4);
+}
+
+.au-cat-badge {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.au-cat-text {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.au-cat-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--lp-text);
+}
+
+.au-cat-progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.au-progress-track {
+  flex: 1;
+  max-width: 130px;
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(147, 164, 181, 0.25);
+  overflow: hidden;
+}
+
+.au-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.3s ease-out;
+}
+
+.au-cat-count {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--lp-muted);
+  white-space: nowrap;
+}
+
+.au-score-chip {
+  display: grid;
+  place-items: center;
+  width: 66px;
+  flex-shrink: 0;
+  border: 1.5px solid;
+  border-radius: 13px;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--lp-text);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Kartu skor total + bintang ── */
+.au-score-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+  padding: 18px;
+  animation-delay: 0.28s;
+}
+
+.au-score-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--lp-muted);
+}
+
+.au-score-total {
+  margin-top: 4px;
+  font-size: 34px;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--lp-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.au-score-max {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--lp-muted);
+}
+
+.au-stars {
+  display: flex;
+  gap: 6px;
+}
+
+.au-star {
+  color: rgba(147, 164, 181, 0.35);
+  transition: color 0.25s ease-out, transform 0.25s ease-out;
+}
+
+.au-star.is-on {
+  color: #f5b301;
+  animation: au-star-pop 0.35s ease-out both;
+}
+
+.au-star.is-on:nth-child(1) { animation-delay: 0.02s; }
+.au-star.is-on:nth-child(2) { animation-delay: 0.07s; }
+.au-star.is-on:nth-child(3) { animation-delay: 0.12s; }
+.au-star.is-on:nth-child(4) { animation-delay: 0.17s; }
+.au-star.is-on:nth-child(5) { animation-delay: 0.22s; }
+
+/* ── Tombol aksi ── */
+.au-actions {
+  margin-top: 18px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.au-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 50px;
+  padding: 0 26px;
+  border: 0;
+  border-radius: 13px;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.16s ease-out, box-shadow 0.16s ease-out, background-color 0.16s ease-out;
+}
+
+.au-btn-primary {
+  background: linear-gradient(135deg, #1e7ec8 0%, #155e97 100%);
+  color: #ffffff;
+  box-shadow: 0 12px 28px rgba(30, 126, 200, 0.3);
+}
+
+.au-btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 36px rgba(30, 126, 200, 0.42);
+}
+
+.au-btn-primary:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.au-btn-full {
+  width: 100%;
+}
+
+.au-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 180, 216, 0.55);
+}
+
+.au-submit-hint {
+  margin-top: 10px;
+  text-align: right;
+  font-size: 12px;
+  color: var(--lp-muted);
+}
+
+/* ── Detail kategori ── */
+.au-item-card {
+  overflow: hidden;
+  margin-bottom: 14px;
+  padding: 18px;
+  border-left-width: 5px;
+  animation: lp-rise 0.45s ease-out both;
+}
+
+.au-item-card:nth-child(2) { animation-delay: 0.05s; }
+.au-item-card:nth-child(3) { animation-delay: 0.1s; }
+
+.au-item-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--lp-text);
+  margin-bottom: 14px;
+}
+
+.au-field {
+  display: grid;
+  gap: 7px;
+  margin-bottom: 16px;
+}
+
+.au-field:last-child {
+  margin-bottom: 0;
+}
+
+.au-field-label {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--lp-muted);
+}
+
+.au-field-label strong {
+  color: #e03131;
+}
+
+/* Segmented score 0 / 3 / 5 */
+.au-seg {
+  display: flex;
+  gap: 8px;
+}
+
+.au-seg-btn {
+  flex: 1;
+  min-height: 48px;
+  border: 1.5px solid var(--lp-line);
+  border-radius: 12px;
+  background: transparent;
+  font-family: inherit;
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--lp-text);
+  cursor: pointer;
+  transition: all 0.15s ease-out;
+}
+
+.au-seg-btn:hover:not(.is-active) {
+  border-color: rgba(147, 164, 181, 0.55);
+}
+
+.au-seg-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 180, 216, 0.4);
+}
+
+.au-seg-btn.is-active {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+  transform: translateY(-1px);
+}
+
+/* Textarea */
+.au-textarea {
+  width: 100%;
+  padding: 11px 13px;
+  border: 1px solid var(--lp-line);
+  border-radius: 12px;
+  background: rgba(147, 164, 181, 0.06);
+  color: var(--lp-text);
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+  resize: vertical;
+  transition: border-color 0.16s ease-out, box-shadow 0.16s ease-out;
+}
+
+.au-textarea::placeholder {
+  color: var(--lp-muted);
+  opacity: 0.7;
+}
+
+.au-textarea:focus {
+  outline: none;
+  border-color: #1e7ec8;
+  box-shadow: 0 0 0 3px rgba(30, 126, 200, 0.22);
+}
+
+/* Evidence picker */
+.au-evidence input[type='file'] {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+}
+
+.au-evidence-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 22px 16px;
+  border: 2px dashed var(--lp-line);
+  border-radius: 14px;
+  background: rgba(147, 164, 181, 0.06);
+  color: var(--lp-muted);
+  font-size: 13px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.16s ease-out, background-color 0.16s ease-out;
+}
+
+.au-evidence-label:hover {
+  border-color: #1e7ec8;
+  background: rgba(30, 126, 200, 0.07);
+}
+
+.au-evidence-hint {
+  font-size: 11px;
+  opacity: 0.85;
+}
+
+.au-evidence-preview {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+}
+
+.au-evidence-thumb {
+  width: 54px;
+  height: 54px;
+  flex-shrink: 0;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid var(--lp-line);
+}
+
+.au-evidence-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--lp-text);
+  word-break: break-all;
+}
+
+.au-evidence-remove {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border: 1px solid var(--lp-line);
+  border-radius: 9px;
+  background: transparent;
+  color: #e03131;
+  cursor: pointer;
+  transition: background-color 0.15s ease-out;
+}
+
+.au-evidence-remove:hover {
+  background: rgba(224, 49, 49, 0.12);
+}
+
+.au-evidence-error {
+  margin-top: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #e03131;
+}
+
+/* ── Pesan inline ── */
+.au-msg {
+  margin-top: 14px;
+  padding: 13px 15px;
+  border-radius: 12px;
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+
+.au-msg-success {
+  border: 1px solid rgba(47, 158, 68, 0.35);
+  background: rgba(47, 158, 68, 0.1);
+  color: #2b8a3e;
+}
+
+.lp-root:not(.lp-light) .au-msg-success {
+  color: #8ce99a;
+}
+
+.au-msg-error {
+  border: 1px solid rgba(224, 49, 49, 0.35);
+  background: rgba(224, 49, 49, 0.1);
+  color: #c92a2a;
+}
+
+.lp-root:not(.lp-light) .au-msg-error {
+  color: #ffa8a8;
+}
+
+/* ── Halaman sukses ── */
+.au-success {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  max-width: 460px;
+  margin: 40px auto;
+  padding: 36px 28px;
+  text-align: center;
+  animation: lp-rise 0.5s ease-out both;
+}
+
+.au-success-icon {
+  display: grid;
+  place-items: center;
+  width: 66px;
+  height: 66px;
+  border-radius: 50%;
+  background: rgba(47, 158, 68, 0.14);
+  color: #2f9e44;
+  animation: au-check-pop 0.5s cubic-bezier(0.22, 0.9, 0.3, 1.3) both;
+}
+
+.au-success-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--lp-text);
+}
+
+.au-success-desc {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--lp-muted);
+}
+
+.au-success-desc strong {
+  color: var(--lp-text);
+}
+
+/* ── Keyframes ── */
+@keyframes au-star-pop {
+  0% { transform: scale(0.4); opacity: 0; }
+  70% { transform: scale(1.25); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes au-check-pop {
+  from { transform: scale(0.4); opacity: 0; }
+}
+
+@media (min-width: 640px) {
+  .au-main { padding: 6px 24px 48px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .au-main *,
+  .au-card,
+  .au-cat-row,
+  .au-item-card,
+  .au-star,
+  .au-success,
+  .au-success-icon {
+    animation: none !important;
+    transition: none !important;
+  }
+}
