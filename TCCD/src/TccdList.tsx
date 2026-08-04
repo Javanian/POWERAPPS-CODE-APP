@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { getContext } from '@microsoft/power-apps/app'
 import {
@@ -10,8 +10,10 @@ import {
   MessageSquare,
   Minus,
   RefreshCw,
+  Search,
   Send,
   UserCheck,
+  X,
   XCircle,
 } from 'lucide-react'
 import { ApprovalFlowTCCDService, TCCDPARTICIPANTSService, TCCDService } from './generated'
@@ -65,7 +67,7 @@ const statusConfigs: StatusConfig[] = [
   { label: 'Waiting Approval', icon: Send, tone: 'waiting-approval' },
   { label: 'Fully Approved', icon: CheckCircle2, tone: 'fully-approved' },
   { label: 'Closed', icon: ClipboardCheck, tone: 'closed' },
-  { label: 'Canceled', icon: Ban, tone: 'canceled' },
+  { label: 'Cancelled', icon: Ban, tone: 'canceled' },
   { label: 'Rejected', icon: XCircle, tone: 'rejected' },
 ]
 
@@ -339,7 +341,7 @@ export function TccdList() {
     }
 
     await updateSelectedRequest({
-      REQUEST_STATUS: 'Canceled',
+      REQUEST_STATUS: 'Cancelled',
     })
     setDetailMode('view')
   }
@@ -444,16 +446,31 @@ export function TccdList() {
 
       <div className="admin-toolbar">
         <label className="search-field">
-          <span></span>
-          <input
-            type="search"
-            value={search}
-            onChange={(event) => {
-              setSearch(event.target.value)
-              setPage(1)
-            }}
-            placeholder="Searh here . . ."
-          />
+          <span className="search-box">
+            <Search size={16} strokeWidth={2.2} aria-hidden="true" />
+            <input
+              type="search"
+              value={search}
+              onChange={(event) => {
+                setSearch(event.target.value)
+                setPage(1)
+              }}
+              placeholder="Cari TCCD No, judul training, PIC..."
+            />
+            {search ? (
+              <button
+                type="button"
+                className="search-clear"
+                onClick={() => {
+                  setSearch('')
+                  setPage(1)
+                }}
+                aria-label="Hapus pencarian"
+              >
+                <X size={14} strokeWidth={2.4} aria-hidden="true" />
+              </button>
+            ) : null}
+          </span>
         </label>
         <div className="admin-filter-state">
           <span>{activeStatus ? `Filter: ${activeStatus}` : ''}</span>
@@ -483,7 +500,10 @@ export function TccdList() {
             <tr>
               <th>TCCD No</th>
               <th>Course Title</th>
+              <th>Type</th>
               <th>PIC</th>
+              <th className="table-heading-center">Planning Date</th>
+              <th className="table-heading-center">Participant</th>
               <th className="table-heading-center">Request Date</th>
               <th className="table-heading-center">Status</th>
             </tr>
@@ -491,7 +511,7 @@ export function TccdList() {
           <tbody>
             {filteredRows.length === 0 ? (
               <tr>
-                <td className="table-message" colSpan={5}>
+                <td className="table-message" colSpan={8}>
                   Data request tidak ditemukan.
                 </td>
               </tr>
@@ -514,12 +534,19 @@ export function TccdList() {
                   <td data-label="Judul Training">
                     <strong>{row.title}</strong>
                   </td>
+                  <td data-label="Type">{cleanText(row.request.TYPE_OF_REQUEST) || '-'}</td>
                   <td data-label="PIC">{row.picName || '-'}</td>
+                  <td className="table-cell-center" data-label="Planning Date">
+                    {formatDateFromText(row.request.PLANNING_DATE)}
+                  </td>
+                  <td className="table-cell-center" data-label="Participant">
+                    {formatNumber(row.request.NUMBER_PARTICIPANT)}
+                  </td>
                   <td className="table-cell-center" data-label="Tanggal Request">
                     {row.requestDate}
                   </td>
                   <td className="table-cell-center" data-label="Status">
-                    <span className={getStatusClassName(row.status)}>{row.status}</span>
+                    <span className={getStatusClassName(row.status)}>{getStatusDisplayLabel(row.status)}</span>
                   </td>
                 </tr>
               ))
@@ -615,6 +642,75 @@ function DashboardCard({
   )
 }
 
+const PARTICIPANT_ROW_DESKTOP = 60
+const PARTICIPANT_OVERSCAN = 6
+const PARTICIPANT_MAX_HEIGHT = 380
+
+function VirtualParticipantList({ participants }: { participants: TCCDPARTICIPANTSRead[] }) {
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const [viewport, setViewport] = useState({ top: 0, height: PARTICIPANT_MAX_HEIGHT, rowHeight: PARTICIPANT_ROW_DESKTOP })
+
+  useEffect(() => {
+    const element = scrollRef.current
+    if (!element) return
+
+    const updateViewport = () => {
+      const style = getComputedStyle(element)
+      const declaredRowHeight = Number.parseInt(style.getPropertyValue('--participant-row-h'), 10)
+      const rowHeight = Number.isFinite(declaredRowHeight) && declaredRowHeight > 0 ? declaredRowHeight : PARTICIPANT_ROW_DESKTOP
+      setViewport({ top: element.scrollTop, height: element.clientHeight || PARTICIPANT_MAX_HEIGHT, rowHeight })
+    }
+
+    updateViewport()
+    element.addEventListener('scroll', updateViewport, { passive: true })
+    const resizeObserver = new ResizeObserver(updateViewport)
+    resizeObserver.observe(element)
+
+    return () => {
+      element.removeEventListener('scroll', updateViewport)
+      resizeObserver.disconnect()
+    }
+  }, [])
+
+  const total = participants.length
+  const rowHeight = viewport.rowHeight
+  const contentHeight = total * rowHeight
+  const startIndex = Math.max(0, Math.floor(viewport.top / rowHeight) - PARTICIPANT_OVERSCAN)
+  const endIndex = Math.min(total, Math.ceil((viewport.top + viewport.height) / rowHeight) + PARTICIPANT_OVERSCAN)
+  const visibleParticipants = participants.slice(startIndex, endIndex)
+
+  return (
+    <div
+      className="participant-detail-list"
+      ref={scrollRef}
+      style={{ height: Math.min(contentHeight, PARTICIPANT_MAX_HEIGHT) }}
+    >
+      <div style={{ height: contentHeight, position: 'relative' }}>
+        {visibleParticipants.map((participant, offset) => {
+          const index = startIndex + offset
+          return (
+            <div
+              className="participant-detail-row"
+              key={participant.ID ?? `${participant.SN}-${participant.NAME}-${index}`}
+              style={{ position: 'absolute', top: index * rowHeight, left: 0, right: 0, height: rowHeight }}
+            >
+              <div>
+                <strong>{cleanText(participant.NAME) || '-'}</strong>
+                <span>{cleanText(participant.SN) || '-'}</span>
+              </div>
+              <div>
+                <span>{cleanText(participant.DIVISION) || '-'}</span>
+                <span>{cleanText(participant.SITE_AREA) || '-'}</span>
+              </div>
+              <span className="participant-status">{cleanText(participant.EMPLOYEE_STATUS) || '-'}</span>
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
 function PersonBadge({ name, email, photoUrl }: { name: string; email: string; photoUrl: string }) {
   const [imageFailed, setImageFailed] = useState(false)
   const isAssigned = Boolean(cleanText(name))
@@ -698,45 +794,34 @@ function RequestDetailPanel({
       >
         <div className="detail-panel-header">
           <div>
-            <span className="detail-kicker">{row.tccdNo || 'TCCD request'}</span>
+            <span className="detail-kicker">{isEditing ? 'Edit Pengajuan' : row.tccdNo || 'TCCD request'}</span>
             <h3>{row.title}</h3>
           </div>
           <button type="button" className="detail-close-button" onClick={onClose} aria-label="Tutup detail">
-            X
+            <X size={18} strokeWidth={2.2} aria-hidden="true" />
           </button>
         </div>
 
         <div className="detail-summary">
           <PersonBadge name={row.picName} email={row.picEmail} photoUrl={row.picPhoto} />
-          <span className={getStatusClassName(row.status)}>{row.status}</span>
+          <span className={getStatusClassName(row.status)}>{getStatusDisplayLabel(row.status)}</span>
         </div>
 
-        <div className="detail-actions">
-          {isEditing && editValues ? (
-            <>
-              <button type="button" className="detail-secondary-action" onClick={onCancelEdit} disabled={isSaving}>
-                Batalkan Perubahan
-              </button>
-              <button type="button" className="detail-primary-action" onClick={() => void onSave()} disabled={isSaving}>
-                {isSaving ? 'Menyimpan...' : 'Simpan Perubahan'}
-              </button>
-            </>
-          ) : (
-            <>
-              <button type="button" className="detail-secondary-action" onClick={onEdit} disabled={isCanceled || isSaving}>
-                Edit
-              </button>
-              <button
-                type="button"
-                className="detail-danger-action"
-                onClick={() => void onCancelRequest()}
-                disabled={isCanceled || isSaving}
-              >
-                {isSaving ? 'Memproses...' : 'Batalkan Pengajuan Training'}
-              </button>
-            </>
-          )}
-        </div>
+        {!isEditing ? (
+          <div className="detail-actions">
+            <button type="button" className="detail-secondary-action" onClick={onEdit} disabled={isCanceled || isSaving}>
+              Edit
+            </button>
+            <button
+              type="button"
+              className="detail-danger-action"
+              onClick={() => void onCancelRequest()}
+              disabled={isCanceled || isSaving}
+            >
+              {isSaving ? 'Memproses...' : 'Batalkan Pengajuan Training'}
+            </button>
+          </div>
+        ) : null}
 
         {isCanceled ? (
           <div className="detail-empty-state">Request sudah berstatus final, sehingga tidak bisa diedit.</div>
@@ -745,60 +830,78 @@ function RequestDetailPanel({
         {actionError ? <div className="detail-empty-state detail-error-state">{actionError}</div> : null}
 
         {isEditing && editValues ? (
-          <div className="detail-edit-grid">
-            <EditField label="Type of Request">
-              <select
-                value={editValues.requestType}
-                onChange={(event) => onEditValueChange('requestType', event.target.value)}
-                disabled={isSaving}
-              >
-                <option value="training">Training</option>
-                <option value="certification">Certification</option>
-              </select>
-            </EditField>
-            <EditField label="Planning Date">
-              <input
-                type="date"
-                value={editValues.planningDate}
-                onChange={(event) => onEditValueChange('planningDate', event.target.value)}
-                disabled={isSaving}
-              />
-            </EditField>
-            <EditField label="Learning Implementation">
-              <select
-                value={editValues.learningImplement}
-                onChange={(event) => onEditValueChange('learningImplement', event.target.value)}
-                disabled={isSaving}
-              >
-                <option value="internal">Internal</option>
-                <option value="eksternal">External</option>
-              </select>
-            </EditField>
-            <EditField label="Note" wide>
-              <textarea
-                value={editValues.note}
-                onChange={(event) => onEditValueChange('note', event.target.value)}
-                rows={3}
-                disabled={isSaving}
-              />
-            </EditField>
-            <EditField label="Justification" wide>
-              <textarea
-                value={editValues.justification}
-                onChange={(event) => onEditValueChange('justification', event.target.value)}
-                rows={4}
-                disabled={isSaving}
-              />
-            </EditField>
-            <EditField label="Objective" wide>
-              <textarea
-                value={editValues.objective}
-                onChange={(event) => onEditValueChange('objective', event.target.value)}
-                rows={4}
-                disabled={isSaving}
-              />
-            </EditField>
-          </div>
+          <>
+            <div className="detail-edit-group">
+              <h5 className="detail-edit-group-title">Informasi Umum</h5>
+              <div className="detail-edit-grid">
+                <EditField label="Type of Request">
+                  <select
+                    value={editValues.requestType}
+                    onChange={(event) => onEditValueChange('requestType', event.target.value)}
+                    disabled={isSaving}
+                  >
+                    <option value="training">Training</option>
+                    <option value="certification">Certification</option>
+                  </select>
+                </EditField>
+                <EditField label="Planning Date">
+                  <input
+                    type="date"
+                    value={editValues.planningDate}
+                    onChange={(event) => onEditValueChange('planningDate', event.target.value)}
+                    disabled={isSaving}
+                  />
+                </EditField>
+                <EditField label="Learning Implementation">
+                  <select
+                    value={editValues.learningImplement}
+                    onChange={(event) => onEditValueChange('learningImplement', event.target.value)}
+                    disabled={isSaving}
+                  >
+                    <option value="internal">Internal</option>
+                    <option value="eksternal">External</option>
+                  </select>
+                </EditField>
+              </div>
+            </div>
+            <div className="detail-edit-group">
+              <h5 className="detail-edit-group-title">Detail Pengajuan</h5>
+              <div className="detail-edit-grid">
+                <EditField label="Note" wide>
+                  <textarea
+                    value={editValues.note}
+                    onChange={(event) => onEditValueChange('note', event.target.value)}
+                    rows={3}
+                    disabled={isSaving}
+                  />
+                </EditField>
+                <EditField label="Justification" wide>
+                  <textarea
+                    value={editValues.justification}
+                    onChange={(event) => onEditValueChange('justification', event.target.value)}
+                    rows={4}
+                    disabled={isSaving}
+                  />
+                </EditField>
+                <EditField label="Objective" wide>
+                  <textarea
+                    value={editValues.objective}
+                    onChange={(event) => onEditValueChange('objective', event.target.value)}
+                    rows={4}
+                    disabled={isSaving}
+                  />
+                </EditField>
+              </div>
+            </div>
+            <div className="detail-edit-footer">
+              <button type="button" className="detail-secondary-action" onClick={onCancelEdit} disabled={isSaving}>
+                Batalkan
+              </button>
+              <button type="button" className="detail-primary-action" onClick={() => void onSave()} disabled={isSaving}>
+                {isSaving ? 'Menyimpan...' : 'Simpan Perubahan'}
+              </button>
+            </div>
+          </>
         ) : (
           <dl className="detail-grid">
             <DetailItem label="Request Date" value={row.requestDate} />
@@ -832,21 +935,7 @@ function RequestDetailPanel({
           ) : participants.length === 0 ? (
             <div className="detail-empty-state">Participant belum ditemukan untuk TCCD_NO ini.</div>
           ) : (
-            <div className="participant-detail-list">
-              {participants.map((participant) => (
-                <div className="participant-detail-row" key={participant.ID ?? `${participant.SN}-${participant.NAME}`}>
-                  <div>
-                    <strong>{cleanText(participant.NAME) || '-'}</strong>
-                    <span>{cleanText(participant.SN) || '-'}</span>
-                  </div>
-                  <div>
-                    <span>{cleanText(participant.DIVISION) || '-'}</span>
-                    <span>{cleanText(participant.SITE_AREA) || '-'}</span>
-                  </div>
-                  <span className="participant-status">{cleanText(participant.EMPLOYEE_STATUS) || '-'}</span>
-                </div>
-              ))}
-            </div>
+            <VirtualParticipantList participants={participants} />
           )}
         </div>
       </aside>
@@ -1323,8 +1412,8 @@ function requestBelongsToUser(request: TCCDRead, user: CurrentUser) {
 
 function normalizeStatus(status: string) {
   const normalized = status.toLowerCase().replace(/\s+/g, ' ').trim()
-  // Handle cancel variations
-  if (normalized.includes('cancel') || normalized.includes('canceled') || normalized.includes('cancelled')) return 'canceled'
+  // Handle cancel variations — canonical form is 'cancelled'
+  if (normalized.includes('cancel') || normalized.includes('canceled') || normalized.includes('cancelled')) return 'cancelled'
   if (normalized.includes('reject')) return 'rejected'
   if (normalized.includes('approved') || normalized.includes('fully approved')) return 'fully approved'
   if (normalized.includes('closed')) return 'closed'
@@ -1355,6 +1444,13 @@ function getStatusClassName(status: string) {
   if (normalizedStatus.includes('reject')) return 'status-badge status-rejected'
 
   return 'status-badge'
+}
+
+function getStatusDisplayLabel(status: string) {
+  return normalizeStatus(status)
+    .split(' ')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ')
 }
 
 function getReadableError(error: unknown) {
