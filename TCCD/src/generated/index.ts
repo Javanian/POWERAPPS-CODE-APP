@@ -11,6 +11,7 @@ export * as DivHead_MemberModel from './models/DivHead_MemberModel';
 export * as MemberTCCDModel from './models/MemberTCCDModel';
 export * as Personel_listModel from './models/Personel_listModel';
 export * as TCCDModel from './models/TCCDModel';
+export * as TCCDNotificationAssignModel from './models/TCCDNotificationAssignModel';
 export * as TCCDPARTICIPANTSModel from './models/TCCDPARTICIPANTSModel';
 export * as TCCDParticipantModel from './models/TCCDParticipantModel';
 
@@ -20,6 +21,7 @@ export * from './services/ApprovalTCCDService';
 export * from './services/DivHead_MemberService';
 export * from './services/MemberTCCDService';
 export * from './services/Personel_listService';
+export * from './services/TCCDNotificationAssignService';
 export * from './services/TCCDPARTICIPANTSService';
 export * from './services/TCCDParticipantService';
 export * from './services/TCCDService';

@@ -2,9 +2,11 @@ import { useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import {
   Ban,
+  Check,
   CheckCircle2,
   ClipboardCheck,
   Clock,
+  HelpCircle,
   Hourglass,
   MessageSquare,
   Minus,
@@ -17,6 +19,7 @@ import {
   ApprovalFlowTCCDService,
   ApprovalTCCDService,
   DivHead_MemberService,
+  TCCDNotificationAssignService,
   TCCDPARTICIPANTSService,
   TCCDService,
 } from './generated'
@@ -115,7 +118,7 @@ const adminStatusConfigs: AdminStatusConfig[] = [
   { label: 'Waiting Approval', icon: Send, tone: 'waiting-approval' },
   { label: 'Fully Approved', icon: CheckCircle2, tone: 'fully-approved' },
   { label: 'Closed', icon: ClipboardCheck, tone: 'closed' },
-  { label: 'Canceled', icon: Ban, tone: 'canceled' },
+  { label: 'Cancelled', icon: Ban, tone: 'canceled' },
   { label: 'Rejected', icon: XCircle, tone: 'rejected' },
 ]
 
@@ -421,7 +424,31 @@ export function AdminPortal() {
       ASSIGN_DATE: new Date().toISOString(),
     })
 
-    if (updated) {
+    if (!updated) {
+      return
+    }
+
+    // Trigger TCCD Notification Assign flow to notify the new PIC
+    if (selectedRow?.request.ID && member.PIC_TCCD?.Email) {
+      try {
+        const flowResult = await withPowerAppsTimeout(
+          TCCDNotificationAssignService.Run({
+            number: selectedRow.request.ID,
+            text: cleanText(member.PIC_TCCD.Email),
+            text_1: 'Assign',
+          }),
+        )
+
+        if (flowResult?.success) {
+          showToast('success', 'PIC berhasil diassign dan notifikasi terkirim ke PIC.')
+        } else {
+          showToast('info', 'PIC berhasil diassign, tetapi notifikasi flow gagal terkirim.')
+        }
+      } catch (flowError) {
+        console.warn('TCCD Notification Assign flow gagal dipanggil', flowError)
+        showToast('info', 'PIC berhasil diassign, tetapi notifikasi flow gagal terkirim.')
+      }
+    } else {
       showToast('success', 'PIC berhasil diassign.')
     }
   }
@@ -436,42 +463,32 @@ export function AdminPortal() {
       REQUEST_STATUS: 'Rejected',
     })
 
-    if (updated) {
+    if (!updated) {
+      return
+    }
+
+    // Trigger TCCD Notification Assign flow to notify the requestor
+    if (selectedRow?.request.ID && selectedRow.requestorEmail) {
+      try {
+        const flowResult = await withPowerAppsTimeout(
+          TCCDNotificationAssignService.Run({
+            number: selectedRow.request.ID,
+            text: cleanText(selectedRow.requestorEmail),
+            text_1: 'Reject',
+          }),
+        )
+
+        if (flowResult?.success) {
+          showToast('success', 'Request berhasil direject dan notifikasi terkirim ke requestor.')
+        } else {
+          showToast('info', 'Request berhasil direject, tetapi notifikasi flow gagal terkirim.')
+        }
+      } catch (flowError) {
+        console.warn('TCCD Notification Assign flow gagal dipanggil saat reject', flowError)
+        showToast('info', 'Request berhasil direject, tetapi notifikasi flow gagal terkirim.')
+      }
+    } else {
       showToast('success', 'Request berhasil direject.')
-    }
-  }
-
-  async function submitDetail() {
-    if (!detailValues) {
-      return
-    }
-
-    if (selectedRow && isLockedStatus(selectedRow.status)) {
-      setDetailError('Request sudah final, sehingga tidak bisa diedit.')
-      return
-    }
-
-    const updated = await updateSelectedRequest({
-      COURSE_TITLE: detailValues.courseTitle.trim(),
-      Title: detailValues.courseTitle.trim(),
-      PLANNING_DATE: detailValues.planningDate,
-      TYPE_OF_REQUEST: detailValues.requestType,
-      JUSTIFICATION: detailValues.justification.trim(),
-      OBJECTIVE: detailValues.objective.trim(),
-      NUMBER_PARTICIPANT: parseOptionalNumber(detailValues.participantCount),
-      PROVIDER: detailValues.learningImplement,
-      NOTE: detailValues.note.trim(),
-      BUDGET: detailValues.budget,
-      EXPENSE_CATEGORY: detailValues.expenseCategory,
-      VENDOR_NAME: detailValues.vendorName.trim(),
-      TYPE_OF_LEARNING: detailValues.typeOfLearning,
-      TOTAL_EXPENSES: parseOptionalNumber(detailValues.totalExpense),
-      REQUEST_STATUS: 'Waiting Approval',
-      PROCESS_DATE: new Date().toISOString(),
-    })
-
-    if (updated) {
-      showToast('success', 'Request berhasil disubmit.')
     }
   }
 
@@ -877,6 +894,69 @@ export function AdminPortal() {
     }
   }
 
+  async function submitAndRunApproval() {
+    if (!detailValues || !selectedRow) {
+      return
+    }
+
+    if (isLockedStatus(selectedRow.status)) {
+      setDetailError('Request sudah final, sehingga tidak bisa diajukan approval.')
+      return
+    }
+
+    if (normalizeStatus(selectedRow.status) === 'waiting approval') {
+      showToast('info', 'Approval untuk request ini sudah berjalan.')
+      return
+    }
+
+    const saved = await updateSelectedRequest({
+      COURSE_TITLE: detailValues.courseTitle.trim(),
+      Title: detailValues.courseTitle.trim(),
+      PLANNING_DATE: detailValues.planningDate,
+      TYPE_OF_REQUEST: detailValues.requestType,
+      JUSTIFICATION: detailValues.justification.trim(),
+      OBJECTIVE: detailValues.objective.trim(),
+      NUMBER_PARTICIPANT: parseOptionalNumber(detailValues.participantCount),
+      PROVIDER: detailValues.learningImplement,
+      NOTE: detailValues.note.trim(),
+      BUDGET: detailValues.budget,
+      EXPENSE_CATEGORY: detailValues.expenseCategory,
+      VENDOR_NAME: detailValues.vendorName.trim(),
+      TYPE_OF_LEARNING: detailValues.typeOfLearning,
+      TOTAL_EXPENSES: parseOptionalNumber(detailValues.totalExpense),
+    })
+
+    if (!saved) {
+      return
+    }
+
+    await runApproval()
+  }
+
+  async function closeRequest() {
+    if (!selectedRow) {
+      return
+    }
+
+    if (isLockedStatus(selectedRow.status)) {
+      setDetailError('Request sudah final, sehingga tidak bisa ditutup.')
+      return
+    }
+
+    if (normalizeStatus(selectedRow.status) !== 'fully approved') {
+      setDetailError('Request hanya bisa ditutup setelah berstatus Fully Approved.')
+      return
+    }
+
+    const updated = await updateSelectedRequest({
+      REQUEST_STATUS: 'Closed',
+    })
+
+    if (updated) {
+      showToast('success', 'Request berhasil ditutup.')
+    }
+  }
+
   if (isLoading) {
     return (
       <section className="admin-page section-container">
@@ -1048,7 +1128,6 @@ export function AdminPortal() {
           isApproversLoading={isApproversLoading}
           isRoutingSaving={isRoutingSaving}
           isFlowRunning={isFlowRunning}
-          isApprovalRunLocked={approvalRunLocks.has(getApprovalRunKey(selectedRow))}
           routingError={routingError}
           onClose={closeDetail}
           onSelectedPicChange={setSelectedPicClaims}
@@ -1057,10 +1136,10 @@ export function AdminPortal() {
           onDetailValueChange={(field, value) =>
             setDetailValues((currentValues) => (currentValues ? { ...currentValues, [field]: value } : currentValues))
           }
-          onSubmitDetail={() => void submitDetail()}
+          onSubmitAndRunApproval={() => void submitAndRunApproval()}
           onViewParticipants={() => void viewParticipants()}
           onOpenRouting={() => void openRoutingPanel()}
-          onRunApproval={() => void runApproval()}
+          onCloseRequest={() => void closeRequest()}
           onCloseParticipants={() => {
             setShowParticipants(false)
             setEditingParticipantId(null)
@@ -1196,13 +1275,65 @@ function TccdAdminTable({
                   {row.requestDate}
                 </td>
                 <td className="table-cell-center" data-label="Status">
-                  <span className={getStatusClassName(row.status)}>{row.status}</span>
+                  <span className={getStatusClassName(row.status)}>{getStatusDisplayLabel(row.status)}</span>
                 </td>
               </tr>
             ))
           )}
         </tbody>
       </table>
+    </div>
+  )
+}
+
+const workflowStages = [
+  { key: 'waiting assign', label: 'Waiting Assign', icon: Hourglass },
+  { key: 'assigned', label: 'Assigned', icon: UserCheck },
+  { key: 'waiting approval', label: 'Waiting Approval', icon: Send },
+  { key: 'fully approved', label: 'Fully Approved', icon: CheckCircle2 },
+  { key: 'closed', label: 'Closed', icon: ClipboardCheck },
+] as const
+
+function getWorkflowStageIndex(status: string) {
+  const normalizedStatus = normalizeStatus(status)
+
+  if (normalizedStatus === 'rejected' || normalizedStatus === 'cancelled') {
+    return 3
+  }
+
+  return workflowStages.findIndex((stage) => stage.key === normalizedStatus)
+}
+
+function WorkflowStepper({ status }: { status: string }) {
+  const normalizedStatus = normalizeStatus(status)
+  const currentIndex = getWorkflowStageIndex(status)
+  const terminalVariant = normalizedStatus === 'rejected' || normalizedStatus === 'cancelled'
+
+  return (
+    <div className="workflow-stepper" aria-label="Tahapan workflow pengajuan">
+      {workflowStages.map((stage, index) => {
+        const Icon = stage.icon
+        const state = index < currentIndex ? 'done' : index === currentIndex ? 'current' : 'upcoming'
+        let label: string = stage.label
+        if (index === 3 && normalizedStatus === 'rejected') label = 'Rejected'
+        if (index === 3 && normalizedStatus === 'cancelled') label = 'Cancelled'
+        const isTerminal = terminalVariant && index === 3
+
+        return (
+          <div
+            key={stage.key}
+            className={`workflow-step workflow-step-${state}${isTerminal ? ' workflow-step-terminal' : ''}`}
+          >
+            <div className="workflow-step-rail">
+              <span className="workflow-step-dot">
+                {state === 'done' ? <Check size={14} strokeWidth={3} /> : <Icon size={15} strokeWidth={2.4} />}
+              </span>
+              {index < workflowStages.length - 1 ? <span className="workflow-step-line" /> : null}
+            </div>
+            <span className="workflow-step-label">{label}</span>
+          </div>
+        )
+      })}
     </div>
   )
 }
@@ -1233,14 +1364,12 @@ function AdminDetailPanel({
   isApproversLoading,
   isRoutingSaving,
   isFlowRunning,
-  isApprovalRunLocked,
   routingError,
   onClose,
   onSelectedPicChange,
   onAssignPic,
   onReject,
   onDetailValueChange,
-  onSubmitDetail,
   onViewParticipants,
   onStartEditParticipant,
   onCancelEditParticipant,
@@ -1252,7 +1381,8 @@ function AdminDetailPanel({
   onUpdateNewParticipantField,
   onSaveNewParticipant,
   onOpenRouting,
-  onRunApproval,
+  onSubmitAndRunApproval,
+  onCloseRequest,
   onCloseParticipants,
   onCloseRouting,
   onToggleApprover,
@@ -1284,14 +1414,12 @@ function AdminDetailPanel({
   isApproversLoading: boolean
   isRoutingSaving: boolean
   isFlowRunning: boolean
-  isApprovalRunLocked: boolean
   routingError: string | null
   onClose: () => void
   onSelectedPicChange: (value: string) => void
   onAssignPic: () => void
   onReject: () => void
   onDetailValueChange: (field: keyof AdminDetailValues, value: string) => void
-  onSubmitDetail: () => void
   onViewParticipants: () => void
   onStartEditParticipant: (participant: TCCDPARTICIPANTSRead) => void
   onCancelEditParticipant: () => void
@@ -1303,7 +1431,8 @@ function AdminDetailPanel({
   onUpdateNewParticipantField: (field: keyof ParticipantEditRow, value: string) => void
   onSaveNewParticipant: () => void
   onOpenRouting: () => void
-  onRunApproval: () => void
+  onSubmitAndRunApproval: () => void
+  onCloseRequest: () => void
   onCloseParticipants: () => void
   onCloseRouting: () => void
   onToggleApprover: (approver: RoutingApprover) => void
@@ -1311,13 +1440,35 @@ function AdminDetailPanel({
   onSubmitRouting: () => void
 }) {
   const isLocked = isLockedStatus(row.status)
-  const canEditRouting = canEditApprovalRouting(row.status)
-  const isApprovalAlreadyRunning = isApprovalRunLocked || normalizeStatus(row.status) === 'waiting approval'
-  const canRunApproval =
-    role === 'ADMIN' &&
-    !isLocked &&
-    !isApprovalAlreadyRunning &&
-    canMoveToStatus(row.status, 'Waiting Approval')
+  const rank = getStatusRank(row.status)
+  const stage = getWorkflowStageIndex(row.status)
+  const canEditDetails = !isLocked && (rank === null || rank < 3)
+  const hasRouting = approvalChainSteps.length > 0
+  const isWaitingAssign = stage === 0
+  const isAssigned = stage === 1
+  const isWaitingApproval = stage === 2
+  const isApproved = stage === 3 && normalizeStatus(row.status) === 'fully approved'
+
+  let stageHint = ''
+  if (isLocked) {
+    stageHint = 'Request sudah berstatus final. Semua fitur edit terkunci.'
+  } else if (isWaitingAssign) {
+    stageHint =
+      role === 'SUPERADMIN'
+        ? 'Langkah ini: pilih PIC admin lalu klik Assign untuk meneruskan request.'
+        : 'Langkah ini: menunggu superadmin menunjuk PIC admin yang akan memproses request.'
+  } else if (isAssigned) {
+    stageHint =
+      role === 'ADMIN'
+        ? hasRouting
+          ? 'Langkah ini: lengkapi detail request, lalu klik "Simpan & Ajukan Approval".'
+          : 'Langkah ini: atur approval routing (pilih approver & urutan) sebelum mengajukan approval.'
+        : 'Request sedang diproses oleh PIC admin.'
+  } else if (isWaitingApproval) {
+    stageHint = 'Langkah ini: menunggu seluruh approver memberikan persetujuan. Status berubah otomatis oleh flow.'
+  } else if (isApproved) {
+    stageHint = 'Semua approver menyetujui. Tutup request setelah pelaksanaan selesai.'
+  }
 
   return (
     <div className="detail-backdrop" role="presentation" onClick={onClose}>
@@ -1338,26 +1489,35 @@ function AdminDetailPanel({
           </button>
         </div>
 
+        <WorkflowStepper status={row.status} />
+
+        {stageHint ? (
+          <div className="stage-hint">
+            <HelpCircle size={15} strokeWidth={2.2} aria-hidden="true" />
+            <span>{stageHint}</span>
+          </div>
+        ) : null}
+
         <div className="detail-summary">
           <div className="admin-detail-summary">
             <span>PIC</span>
             <strong>{row.picName || 'Belum diassign'}</strong>
           </div>
-          <span className={getStatusClassName(row.status)}>{row.status}</span>
+          <span className={getStatusClassName(row.status)}>{getStatusDisplayLabel(row.status)}</span>
         </div>
 
         {isLocked ? (
           <div className="detail-empty-state">Request sudah berstatus final, semua fitur edit dikunci.</div>
         ) : null}
 
-        {role === 'SUPERADMIN' ? (
+        {(isWaitingAssign || isAssigned) && role === 'SUPERADMIN' ? (
           <div className="admin-action-panel">
             <label className="detail-edit-field">
               <span>Assign PIC</span>
               <select
                 value={selectedPicClaims}
                 onChange={(event) => onSelectedPicChange(event.target.value)}
-                disabled={isSaving || isLocked}
+                disabled={isSaving || !canEditDetails}
               >
                 <option value="">Pilih PIC admin</option>
                 {adminMembers.map((member) => (
@@ -1368,11 +1528,83 @@ function AdminDetailPanel({
               </select>
             </label>
             <div className="admin-inline-actions">
-              <button type="button" className="detail-primary-action" onClick={onAssignPic} disabled={isSaving || isLocked}>
+              <button
+                type="button"
+                className="detail-primary-action"
+                onClick={onAssignPic}
+                disabled={isSaving || !canEditDetails}
+              >
                 {isSaving ? 'Memproses...' : 'Assign'}
               </button>
-              <button type="button" className="detail-danger-action" onClick={onReject} disabled={isSaving || isLocked}>
+              <button
+                type="button"
+                className="detail-danger-action"
+                onClick={onReject}
+                disabled={isSaving || !canEditDetails}
+              >
                 Reject
+              </button>
+            </div>
+          </div>
+        ) : null}
+
+        {isAssigned && role === 'ADMIN' ? (
+          <div className="admin-action-panel">
+            {hasRouting ? (
+              <>
+                <div className="stage-action-copy-block">
+                  <strong>Request siap diajukan</strong>
+                  <p>Klik tombol untuk menyimpan seluruh perubahan dan menjalankan approval.</p>
+                </div>
+                <div className="admin-inline-actions">
+                  <button
+                    type="button"
+                    className="detail-primary-action"
+                    onClick={onSubmitAndRunApproval}
+                    disabled={isSaving || isFlowRunning || !canEditDetails}
+                  >
+                    {isFlowRunning ? 'Menjalankan Approval...' : 'Simpan & Ajukan Approval'}
+                  </button>
+                  <button
+                    type="button"
+                    className="detail-secondary-action"
+                    onClick={onOpenRouting}
+                    disabled={isSaving || !canEditDetails}
+                  >
+                    Ubah Routing
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="stage-action-copy-block">
+                  <strong>Approval routing belum diatur</strong>
+                  <p>Pilih approver dan urutan persetujuan sebelum mengajukan approval.</p>
+                </div>
+                <div className="admin-inline-actions">
+                  <button
+                    type="button"
+                    className="detail-primary-action"
+                    onClick={onOpenRouting}
+                    disabled={isSaving || !canEditDetails}
+                  >
+                    Atur Approval Routing
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        ) : null}
+
+        {isApproved ? (
+          <div className="admin-action-panel">
+            <div className="stage-action-copy-block">
+              <strong>Request sudah disetujui</strong>
+              <p>Tutup request setelah pelaksanaan training/sertifikasi selesai.</p>
+            </div>
+            <div className="admin-inline-actions">
+              <button type="button" className="detail-primary-action" onClick={onCloseRequest} disabled={isSaving}>
+                {isSaving ? 'Memproses...' : 'Tutup Request'}
               </button>
             </div>
           </div>
@@ -1383,7 +1615,7 @@ function AdminDetailPanel({
         <div className="admin-detail-section">
           <div className="admin-section-heading">
             <h4>Request Details</h4>
-            <p>Review dan lengkapi informasi utama sebelum submit atau menjalankan approval.</p>
+            <p>Lengkapi informasi request. Perubahan tersimpan saat klik "Simpan & Ajukan Approval".</p>
           </div>
           <div className="detail-edit-grid">
             <label className="detail-edit-field">
@@ -1392,7 +1624,7 @@ function AdminDetailPanel({
                 type="text"
                 value={detailValues.courseTitle}
                 onChange={(event) => onDetailValueChange('courseTitle', event.target.value)}
-                disabled={isSaving || isLocked}
+                disabled={isSaving || !canEditDetails}
               />
             </label>
             <label className="detail-edit-field">
@@ -1401,7 +1633,7 @@ function AdminDetailPanel({
                 type="date"
                 value={detailValues.planningDate}
                 onChange={(event) => onDetailValueChange('planningDate', event.target.value)}
-                disabled={isSaving || isLocked}
+                disabled={isSaving || !canEditDetails}
               />
             </label>
             <label className="detail-edit-field">
@@ -1409,7 +1641,7 @@ function AdminDetailPanel({
               <select
                 value={detailValues.requestType}
                 onChange={(event) => onDetailValueChange('requestType', event.target.value)}
-                disabled={isSaving || isLocked}
+                disabled={isSaving || !canEditDetails}
               >
                 <option value="training">Training</option>
                 <option value="certification">Certification</option>
@@ -1420,7 +1652,7 @@ function AdminDetailPanel({
               <select
                 value={detailValues.learningImplement}
                 onChange={(event) => onDetailValueChange('learningImplement', event.target.value)}
-                disabled={isSaving || isLocked}
+                disabled={isSaving || !canEditDetails}
               >
                 <option value="internal">Internal</option>
                 <option value="eksternal">External</option>
@@ -1433,7 +1665,7 @@ function AdminDetailPanel({
                 min="0"
                 value={detailValues.participantCount}
                 onChange={(event) => onDetailValueChange('participantCount', event.target.value)}
-                disabled={isSaving || isLocked}
+                disabled={isSaving || !canEditDetails}
               />
             </label>
             <label className="detail-edit-field">
@@ -1443,7 +1675,7 @@ function AdminDetailPanel({
                 min="0"
                 value={detailValues.totalExpense}
                 onChange={(event) => onDetailValueChange('totalExpense', event.target.value)}
-                disabled={isSaving || isLocked}
+                disabled={isSaving || !canEditDetails}
               />
             </label>
             <label className="detail-edit-field">
@@ -1451,7 +1683,7 @@ function AdminDetailPanel({
               <select
                 value={detailValues.budget}
                 onChange={(event) => onDetailValueChange('budget', event.target.value)}
-                disabled={isSaving || isLocked}
+                disabled={isSaving || !canEditDetails}
               >
                 <option value="">Pilih budget</option>
                 <option value="Budget">Budget</option>
@@ -1463,7 +1695,7 @@ function AdminDetailPanel({
               <select
                 value={detailValues.expenseCategory}
                 onChange={(event) => onDetailValueChange('expenseCategory', event.target.value)}
-                disabled={isSaving || isLocked}
+                disabled={isSaving || !canEditDetails}
               >
                 <option value="">Pilih kategori</option>
                 <option value="<10 Juta">&lt;10 Juta</option>
@@ -1477,7 +1709,7 @@ function AdminDetailPanel({
                 type="text"
                 value={detailValues.vendorName}
                 onChange={(event) => onDetailValueChange('vendorName', event.target.value)}
-                disabled={isSaving || isLocked}
+                disabled={isSaving || !canEditDetails}
               />
             </label>
             <label className="detail-edit-field">
@@ -1485,7 +1717,7 @@ function AdminDetailPanel({
               <select
                 value={detailValues.typeOfLearning}
                 onChange={(event) => onDetailValueChange('typeOfLearning', event.target.value)}
-                disabled={isSaving || isLocked}
+                disabled={isSaving || !canEditDetails}
               >
                 <option value="">Pilih type</option>
                 {learningOptions.map((option) => (
@@ -1501,7 +1733,7 @@ function AdminDetailPanel({
                 value={detailValues.justification}
                 onChange={(event) => onDetailValueChange('justification', event.target.value)}
                 rows={4}
-                disabled={isSaving || isLocked}
+                disabled={isSaving || !canEditDetails}
               />
             </label>
             <label className="detail-edit-field detail-edit-field-wide">
@@ -1510,7 +1742,7 @@ function AdminDetailPanel({
                 value={detailValues.objective}
                 onChange={(event) => onDetailValueChange('objective', event.target.value)}
                 rows={4}
-                disabled={isSaving || isLocked}
+                disabled={isSaving || !canEditDetails}
               />
             </label>
             <label className="detail-edit-field detail-edit-field-wide">
@@ -1519,7 +1751,7 @@ function AdminDetailPanel({
                 value={detailValues.note}
                 onChange={(event) => onDetailValueChange('note', event.target.value)}
                 rows={3}
-                disabled={isSaving || isLocked}
+                disabled={isSaving || !canEditDetails}
               />
             </label>
           </div>
@@ -1528,24 +1760,6 @@ function AdminDetailPanel({
         <div className="detail-actions admin-detail-actions">
           <button type="button" className="detail-secondary-action" onClick={onViewParticipants} disabled={isSaving}>
             View Participant
-          </button>
-          {role === 'ADMIN' && canEditRouting ? (
-            <button type="button" className="detail-secondary-action" onClick={onOpenRouting} disabled={isSaving || isLocked}>
-              Set Approval Routing
-            </button>
-          ) : null}
-          {role === 'ADMIN' ? (
-            <button
-              type="button"
-              className="detail-primary-action"
-              onClick={onRunApproval}
-              disabled={!canRunApproval || isSaving || isFlowRunning}
-            >
-              {isFlowRunning ? 'Running Approval...' : isApprovalAlreadyRunning ? 'Approval Running' : 'Run Approval'}
-            </button>
-          ) : null}
-          <button type="button" className="detail-primary-action" onClick={onSubmitDetail} disabled={isSaving || isLocked}>
-            {isSaving ? 'Menyimpan...' : 'Submit'}
           </button>
         </div>
 
@@ -2344,7 +2558,7 @@ function getStatusRank(status: string) {
 
 function isTerminalStatus(status: string) {
   const normalizedStatus = normalizeStatus(status)
-  return normalizedStatus === 'closed' || normalizedStatus === 'rejected' || normalizedStatus === 'canceled'
+  return normalizedStatus === 'closed' || normalizedStatus === 'rejected' || normalizedStatus === 'cancelled'
 }
 
 function isLockedStatus(status: string) {
@@ -2558,8 +2772,8 @@ function cleanText(value?: string | null) {
 
 function normalizeStatus(status: string) {
   const normalized = status.toLowerCase().replace(/\s+/g, ' ').trim()
-  // Handle cancel variations
-  if (normalized.includes('cancel') || normalized.includes('canceled') || normalized.includes('cancelled')) return 'canceled'
+  // Handle cancel variations — canonical form is 'cancelled'
+  if (normalized.includes('cancel') || normalized.includes('canceled') || normalized.includes('cancelled')) return 'cancelled'
   if (normalized.includes('reject')) return 'rejected'
   if (normalized.includes('approved') || normalized.includes('fully approved')) return 'fully approved'
   if (normalized.includes('closed')) return 'closed'
@@ -2656,4 +2870,11 @@ function getStatusClassName(status: string) {
   if (normalizedStatus.includes('reject')) return 'status-badge status-rejected'
 
   return 'status-badge'
+}
+
+function getStatusDisplayLabel(status: string) {
+  return normalizeStatus(status)
+    .split(' ')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ')
 }
