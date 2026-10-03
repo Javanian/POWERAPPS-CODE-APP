@@ -67,3 +67,17 @@ Thumbs.db
 /TCCD/template_prompt.md
 /UNBLOCK MATERIAL/POWERAPPS_SHAREPOINT_REFERENCE.md
 /UNBLOCK MATERIAL/connection_list.md
+
+# Public repository: keep README files and application source
+*.md
+*.MD
+*.markdown
+!README.md
+!readme.md
+.claude/
+.codex/
+.opencode/
+.cursor/
+.obsidian/
+.mcp.json
+opencode.json

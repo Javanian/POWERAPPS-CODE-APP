@@ -19,4 +19,4 @@ npm run build
 npm run lint
 ```
 
-Setup creates local configuration from examples. Data queries and submissions require compatible SharePoint lists and an authenticated Power Apps runtime. See [integration setup](../../docs/integration.md).
+Setup creates local configuration from examples. Data queries and submissions require compatible SharePoint lists and an authenticated Power Apps runtime. See [integration setup](../../README.md#integration-setup).
