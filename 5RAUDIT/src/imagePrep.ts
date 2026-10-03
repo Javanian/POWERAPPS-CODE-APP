@@ -1,5 +1,4 @@
-// Persiapan gambar di sisi klien sebelum upload (lihat restapi.md §5).
-// base64 menggembungkan payload ~33% — selalu kompres dulu.
+// Base64 adds about 33% to the payload; compress images before upload.
 
 const allowedTypes = ['image/png', 'image/jpeg'] // .jpg & .jpeg dua-duanya 'image/jpeg'
 const maxSizeBytes = 20 * 1024 * 1024
@@ -31,15 +30,7 @@ export async function compressImage(file: File, maxDim = 1600, quality = 0.82): 
   )
 }
 
-/**
- * Kirim data URI UTUH ("data:image/jpeg;base64,...") ke flow, JANGAN buang
- * prefix. Di flow dipasangkan dengan `dataUriToBinary()` — bukan
- * `base64ToBinary()`. Alasannya mode gagal: kalau base64 mentah salah/rusak,
- * `base64ToBinary` tetap "sukses" dan menghasilkan file korup diam-diam;
- * `dataUriToBinary` gagal KERAS bila input bukan data URI valid → flow run
- * merah, ketahuan seketika. Bonus: content-type ikut terbawa, SharePoint tidak
- * menebak dari ekstensi.
- */
+// The flow expects a full data URI and decodes it with dataUriToBinary().
 export async function blobToDataUri(blob: Blob): Promise<string> {
   return new Promise<string>((resolve, reject) => {
     const reader = new FileReader()
@@ -53,12 +44,7 @@ export function extensionForType(mimeType: string) {
   return mimeType === 'image/png' ? 'png' : 'jpg'
 }
 
-/**
- * Object URL preview KECIL (async). JANGAN pakai URL.createObjectURL(file)
- * langsung untuk <img> preview — itu memaksa browser men-decode foto full-res
- * (4–12MP) di main thread cuma untuk thumbnail → tablet "not responding".
- * Di sini gambar di-downscale dulu (createImageBitmap async) jadi ~240px.
- */
+// Downscale previews to avoid decoding full-resolution photos for thumbnails.
 export async function makePreviewObjectUrl(file: File, maxDim = 240): Promise<string> {
   const smallBlob = await compressImage(file, maxDim, 0.6)
   return URL.createObjectURL(smallBlob)

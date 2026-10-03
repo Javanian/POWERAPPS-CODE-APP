@@ -1,0 +1,43 @@
+{
+  "version": "1.0",
+  "appId": "00000000-0000-4000-8000-000000000268",
+  "appDisplayName": "Unblock Material",
+  "region": "prod",
+  "environmentId": "00000000-0000-4000-8000-000000000194",
+  "description": "Power Apps Code App starter for Unblock Material.",
+  "buildPath": "./dist",
+  "buildEntryPoint": "index.html",
+  "localAppUrl": "http://localhost:3000",
+  "logoPath": "Default",
+  "connectionReferences": {
+    "00000000-0000-4000-8000-000000000209": {
+      "id": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+      "displayName": "SharePoint",
+      "dataSources": [
+        "unblockmaterial",
+        "unblock material",
+        "unblockmaterialticket",
+        "unblock material ticket"
+      ],
+      "dataSets": {
+        "https://example.sharepoint.com/sites/operations/mfg/scm/": {
+          "dataSources": {
+            "unblockmaterial": {
+              "tableName": "00000000-0000-4000-8000-000000000536"
+            },
+            "unblock material": {
+              "tableName": "00000000-0000-4000-8000-000000000536"
+            },
+            "unblockmaterialticket": {
+              "tableName": "00000000-0000-4000-8000-000000000080"
+            },
+            "unblock material ticket": {
+              "tableName": "00000000-0000-4000-8000-000000000080"
+            }
+          }
+        }
+      }
+    }
+  },
+  "databaseReferences": {}
+}
