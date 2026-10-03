@@ -40,12 +40,21 @@ The examples support compilation and inspection of the source. They do not suppl
 
 ## Integration setup
 
-See [Power Apps integration](docs/integration.md) for configuration files, connector generation and application-specific requirements.
+Run `npm run setup` inside each application to copy tracked examples to ignored local configuration. Replace example identifiers with your own environment, connections, datasets, lists, and flows. Register the data sources with the Power Apps CLI and regenerate the `.power` descriptors and `src/generated` services with aliases compatible with the existing service classes.
 
 - `power.config.example.json` contains example environment, connection, list and flow identifiers.
 - `config/dataSourcesInfo.example.ts` supplies an example descriptor for compilation. Setup copies it to the ignored `.power` directory.
 - `src/generated` contains the typed connector models and services, including the Microsoft copyright notices. Regenerate these files when the target schema changes.
 - TCCD uses synthetic employee records by default. Real employee workbooks and converted data stay outside version control.
+
+### Application requirements
+
+- **5R Audit:** requires audit and area-master lists. Its upload flow accepts `text` (filename) and `text_1` (image data URI), decodes the image, and returns `path`. Preserve the extended descriptor registered by `src/powerAppsClient.ts` when regenerating connectors.
+- **TCCD:** requires request, participant, member, division-head, personnel, and approval lists plus approval and notification flows. Configure membership permissions in SharePoint and Power Automate. Employee lookup JSON is bundled into the frontend; Git ignore does not protect it after deployment. Convert an authorized workbook with `npm run convert:employee -- "C:\\private-data\\employee.xlsx"`.
+- **Vehicle Mileage:** requires compatible mileage, driver, and vehicle lists.
+- **Unblock Material:** requires ticket and material lists linked through `IDTICKET`. Its example descriptor has no operations; generate real descriptors before live queries. `scripts/add-sharepoint-data-sources.ps1` accepts the site URL, connection ID, and list resource names after CLI authentication.
+
+Configure the example site constants in the relevant app and replace TCCD example resource links before deployment. Flow implementations are not included in this repository.
 
 Tenant-specific configuration, internal reference notes, agent prompts, logs, preview exports and operational datasets are excluded from this repository. SharePoint list permissions and flow permissions must enforce access; client-side role checks alone are insufficient.
 
