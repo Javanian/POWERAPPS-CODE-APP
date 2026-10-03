@@ -10,19 +10,8 @@ export const getItemsOperationName = 'GetItems'
 export const httpRequestOperationName = 'HttpRequest'
 export const createFileOperationName = 'CreateFile'
 
-/**
- * PENTING — SDK Power Apps menyimpan dataSourcesInfo sebagai SINGLETON:
- * PowerDataSourcesInfoProvider.getInstance() hanya memakai schema dari
- * panggilan operasi data PERTAMA; schema pada panggilan berikutnya diabaikan.
- * Konsekuensinya:
- *   1. Semua operasi manual (PostItem, CreateAttachment, GetItems) WAJIB
- *      digabung dalam SATU schema di file ini.
- *   2. Semua akses data app harus lewat `powerAppsClient` di bawah — JANGAN
- *      memanggil generated service (yang membawa schema polos) atau membuat
- *      getClient() lain, karena bisa mengunci registry tanpa operasi manual.
- * Gejala kalau dilanggar: "Execute operation failure: Cannot read properties
- * of undefined (reading 'path')".
- */
+// The SDK caches the first descriptor. Register manual operations together
+// and use this client so later calls can resolve their operation paths.
 const extendedDataSourcesInfo = {
   ...dataSourcesInfo,
   [primaryDataSourceName]: {

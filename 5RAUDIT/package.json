@@ -7,7 +7,10 @@
     "dev": "vite --port 3000 --strictPort",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "setup": "node ../scripts/setup-local.mjs",
+    "prebuild": "npm run setup",
+    "predev": "npm run setup"
   },
   "dependencies": {
     "@microsoft/power-apps": "^1.1.9",
