@@ -8,7 +8,10 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "convert:employee": "node scripts/convert-employee-xlsx.mjs",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "setup": "node ../scripts/setup-local.mjs",
+    "prebuild": "npm run setup",
+    "predev": "npm run setup"
   },
   "dependencies": {
     "@microsoft/power-apps": "^1.1.9",

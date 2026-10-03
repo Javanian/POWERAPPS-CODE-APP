@@ -1,0 +1,69 @@
+# Dependencies and build output
+node_modules/
+dist/
+dist-ssr/
+coverage/
+*.tsbuildinfo
+
+# Local runtime configuration and connector exports
+power.config.json
+.power/
+.env
+.env.*
+!.env.example
+*.local
+
+# Internal working notes and agent configuration
+.claude/
+.codex/
+.cursor/
+AGENTS.md
+CLAUDE.md
+SKILL.md
+prompt_template.md
+template_prompt.md
+connection*.md
+PAC-CLI.md
+starting_pac.md
+hint.md
+source.md
+listid.json
+
+# Operational data, logs and previews
+TCCD/src/excel/employee.json
+TCCD/src/excel/employee.xlsx
+*.log
+.local-logs/
+.preview/
+
+# Editor and OS files
+.idea/
+.vscode/
+*.code-workspace
+.DS_Store
+Thumbs.db
+
+# Project-specific internal references
+/5RAUDIT/FLOW_EVIDENCE_UPLOAD.md
+/5RAUDIT/FOLLOWUP_DESIGN.md
+/5RAUDIT/POWERAPPS_IMAGE.md
+/5RAUDIT/POWERAPPS_SHAREPOINT_ATTACHMENT_REFERENCE.md
+/5RAUDIT/POWERAPPS_SHAREPOINT_REFERENCE.md
+/5RAUDIT/connection_list.md
+/5RAUDIT/powerautomate flow.md
+/Kilometer Kendaraan/Vehicle-km/PAC-CLI.md
+/Kilometer Kendaraan/Vehicle-km/SKILL.md
+/Kilometer Kendaraan/Vehicle-km/connection.md
+/Kilometer Kendaraan/Vehicle-km/source.md
+/TCCD/PAC-CLI.md
+/TCCD/SKILL.md
+/TCCD/connection.md
+/TCCD/connection_guide.md
+/TCCD/connection_list.md
+/TCCD/excel-connector-guide.md
+/TCCD/hint.md
+/TCCD/prompt_template.md
+/TCCD/starting_pac.md
+/TCCD/template_prompt.md
+/UNBLOCK MATERIAL/POWERAPPS_SHAREPOINT_REFERENCE.md
+/UNBLOCK MATERIAL/connection_list.md

@@ -1,0 +1,20 @@
+[
+  {
+    "personnel_number": "DEMO-001",
+    "nama": "Demo Employee One",
+    "division": "Operations",
+    "area": "Demo Site",
+    "status": "Permanent",
+    "masa_kerja": "2",
+    "jobtitle": "Demo Technician"
+  },
+  {
+    "personnel_number": "DEMO-002",
+    "nama": "Demo Employee Two",
+    "division": "Quality",
+    "area": "Demo Site",
+    "status": "Contract",
+    "masa_kerja": "1",
+    "jobtitle": "Demo Inspector"
+  }
+]
