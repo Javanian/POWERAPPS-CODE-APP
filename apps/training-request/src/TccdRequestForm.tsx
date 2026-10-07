@@ -281,9 +281,6 @@ export function TccdRequestForm() {
   return (
     <section className="form-page section-container">
       <div className="page-title-block">
-        <a className="back-link" href="#/">
-          Kembali ke Halaman Utama
-        </a>
         <h1>Form Pengajuan Training</h1>
         <p>
           Isi kebutuhan training lalu lanjutkan ke pengisian peserta sebelum Submit.
