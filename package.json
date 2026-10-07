@@ -1,0 +1,15 @@
+{
+  "name": "power-apps-workflow-suite",
+  "private": true,
+  "description": "Power Apps code apps for operational workflows, built with React, TypeScript and SharePoint connectors.",
+  "author": "Javanian",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "install:all": "node scripts/run-all.mjs ci",
+    "lint": "node scripts/run-all.mjs lint",
+    "build": "node scripts/run-all.mjs build"
+  }
+}
