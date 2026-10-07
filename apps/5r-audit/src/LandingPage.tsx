@@ -1,7 +1,6 @@
 import './landing.css'
-import { ChevronRight, ClipboardCheck, ListChecks, Moon, Sun, Wrench } from 'lucide-react'
+import { ChevronRight, ClipboardCheck, ListChecks, Moon, ShieldCheck, Sun } from 'lucide-react'
 import gearLogo from './asset/5S_MR.png'
-import brandLogo from './asset/brand.png'
 
 const pillars = ['Ringkas', 'Rapi', 'Resik', 'Rawat', 'Rajin']
 
@@ -15,7 +14,10 @@ export type ThemeProps = {
 export function TopBar({ theme, onToggleTheme }: ThemeProps) {
   return (
     <header className="lp-topbar">
-      <img className="lp-logo" src={brandLogo} alt="5R Audit" />
+      <span className="lp-brand">
+        <ShieldCheck size={22} aria-hidden="true" />
+        <span>5R Audit</span>
+      </span>
       <div className="lp-topbar-right">
         <span className="lp-topbar-tag">QHSE</span>
         <button
@@ -100,36 +102,6 @@ export function LandingPage({ theme, onToggleTheme, onOpenAuditor, onOpenFollowU
           </button>
         </div>
       </main>
-
-      <footer className="lp-foot">5R Audit &middot; QHSE workplace audit</footer>
-    </div>
-  )
-}
-
-type FollowUpComingSoonProps = ThemeProps & {
-  onBack: () => void
-}
-
-export function FollowUpComingSoon({ theme, onToggleTheme, onBack }: FollowUpComingSoonProps) {
-  return (
-    <div className={rootClassName(theme)}>
-      <div className="lp-sky" aria-hidden="true" />
-
-      <TopBar theme={theme} onToggleTheme={onToggleTheme} />
-
-      <div className="lp-panel">
-        <span className="lp-panel-icon">
-          <Wrench size={26} />
-        </span>
-        <h2 className="lp-panel-title">Follow Up &amp; Audit</h2>
-        <p className="lp-panel-desc">
-          Modul ini sedang disiapkan. Nantinya semua temuan audit dan status tindak
-          lanjutnya bisa dipantau dari sini.
-        </p>
-        <button type="button" className="lp-btn-back" onClick={onBack}>
-          Kembali ke halaman utama
-        </button>
-      </div>
 
       <footer className="lp-foot">5R Audit &middot; QHSE workplace audit</footer>
     </div>
