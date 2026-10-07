@@ -1,7 +1,9 @@
 {
   "name": "vehicle-mileage",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "Operational vehicle mileage logging and reporting",
+  "author": "Javanian",
   "type": "module",
   "scripts": {
     "dev": "vite",

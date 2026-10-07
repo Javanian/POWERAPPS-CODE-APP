@@ -4,10 +4,10 @@ Four React and TypeScript applications for operational workflows, built as Micro
 
 | Application | Workflow | Source |
 | --- | --- | --- |
-| 5R Audit | Workplace audit scoring, photographic evidence and corrective action follow-up | [5RAUDIT](5RAUDIT/) |
-| TCCD | Training and certification requests, participants, approval routing and administration | [TCCD](TCCD/) |
-| Vehicle Mileage | Vehicle and driver selection, mileage entry and reporting | [Vehicle-km](Kilometer%20Kendaraan/Vehicle-km/) |
-| Unblock Material | Material release ticket browsing, status filters and linked material details | [UNBLOCK MATERIAL](UNBLOCK%20MATERIAL/) |
+| 5R Audit | Workplace audit scoring, photographic evidence and corrective action follow-up | [apps/5r-audit](apps/5r-audit/) |
+| TCCD | Training and certification requests, participants, approval routing and administration | [apps/training-request](apps/training-request/) |
+| Vehicle Mileage | Vehicle and driver selection, mileage entry and reporting | [apps/vehicle-mileage](apps/vehicle-mileage/) |
+| Unblock Material | Material release ticket browsing, status filters and linked material details | [apps/unblock-material](apps/unblock-material/) |
 
 Each application has its own package manifest, lockfile and build. There is no shared server in this repository: data access uses the Power Apps SDK, generated connector services and, where needed, connector-backed SharePoint HTTP operations.
 
@@ -24,7 +24,7 @@ npm run dev
 For example, start TCCD from the repository root:
 
 ```powershell
-cd TCCD
+cd apps/training-request
 npm ci
 npm run dev
 ```

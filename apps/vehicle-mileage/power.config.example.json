@@ -1,9 +1,9 @@
 {
   "version": "1.0",
-  "appDisplayName": "Kilometer Kendaraan",
+  "appDisplayName": "Vehicle Mileage",
   "region": "prod",
   "environmentId": "00000000-0000-4000-8000-000000000194",
-  "description": "Aplikasi pencatatan kilometer kendaraan operasional",
+  "description": "Operational vehicle mileage logging and reporting.",
   "buildPath": "./dist",
   "buildEntryPoint": "index.html",
   "localAppUrl": "http://localhost:3000",

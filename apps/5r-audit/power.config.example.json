@@ -4,7 +4,7 @@
   "appDisplayName": "5R Audit",
   "region": "prod",
   "environmentId": "00000000-0000-4000-8000-000000000194",
-  "description": "Power Apps Code App starter for 5R Audit.",
+  "description": "5R workplace audit with photo evidence and corrective-action follow-up.",
   "buildPath": "./dist",
   "buildEntryPoint": "index.html",
   "localAppUrl": "http://localhost:3000",

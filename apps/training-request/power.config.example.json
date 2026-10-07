@@ -1,10 +1,10 @@
 {
   "version": "1.0",
   "appId": "00000000-0000-4000-8000-000000000137",
-  "appDisplayName": "TCCD APP",
+  "appDisplayName": "TCCD Training Request",
   "region": "prod",
   "environmentId": "00000000-0000-4000-8000-000000000194",
-  "description": " ",
+  "description": "Training and certification request workflow with approval routing.",
   "buildPath": "./dist",
   "buildEntryPoint": "index.html",
   "localAppUrl": "http://localhost:3000",

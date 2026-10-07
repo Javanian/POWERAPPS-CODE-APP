@@ -4,7 +4,7 @@
   "appDisplayName": "Unblock Material",
   "region": "prod",
   "environmentId": "00000000-0000-4000-8000-000000000194",
-  "description": "Power Apps Code App starter for Unblock Material.",
+  "description": "Material unblock ticket tracking with linked material details.",
   "buildPath": "./dist",
   "buildEntryPoint": "index.html",
   "localAppUrl": "http://localhost:3000",

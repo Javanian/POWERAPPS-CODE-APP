@@ -21,4 +21,4 @@ npm run build
 npm run lint
 ```
 
-Setup runs before development and builds. The sample configuration compiles without connecting to a real tenant. Audit writes, image uploads and follow-up updates require the configured lists, flow and authenticated runtime described in [integration setup](../README.md#integration-setup).
+Setup runs before development and builds. The sample configuration compiles without connecting to a real tenant. Audit writes, image uploads and follow-up updates require the configured lists, flow and authenticated runtime described in [integration setup](../../README.md#integration-setup).
