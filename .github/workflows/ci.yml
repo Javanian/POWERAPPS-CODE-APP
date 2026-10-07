@@ -1,32 +1,38 @@
-name: Build applications
+name: CI
 
 on:
   push:
+    branches: [main]
   pull_request:
 
 permissions:
   contents: read
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  build:
+  verify:
+    name: ${{ matrix.app }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         app:
-          - 5RAUDIT
-          - TCCD
-          - Kilometer Kendaraan/Vehicle-km
-          - UNBLOCK MATERIAL
+          - 5r-audit
+          - training-request
+          - vehicle-mileage
+          - unblock-material
     defaults:
       run:
-        working-directory: ${{ matrix.app }}
+        working-directory: apps/${{ matrix.app }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 24
           cache: npm
-          cache-dependency-path: ${{ matrix.app }}/package-lock.json
+          cache-dependency-path: apps/${{ matrix.app }}/package-lock.json
       - run: npm ci
       - run: npm run build

@@ -20,4 +20,4 @@ npm run build
 npm run lint
 ```
 
-The sample descriptor permits compilation but has no connector operations. Generate real descriptors before testing queries against a tenant. This source implements browsing and status visibility; it does not include the backend release workflow. See [integration setup](../README.md#integration-setup).
+The sample descriptor permits compilation but has no connector operations. Generate real descriptors before testing queries against a tenant. This source implements browsing and status visibility; it does not include the backend release workflow. See [integration setup](../../README.md#integration-setup).
