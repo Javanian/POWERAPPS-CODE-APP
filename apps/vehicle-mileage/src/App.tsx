@@ -1,9 +1,9 @@
 import { ThemeProvider } from "@/providers/theme-provider"
 import { SonnerProvider } from "@/providers/sonner-provider"
-import { QueryProvider } from "./providers/query-provider"
+import { QueryProvider } from "@/providers/query-provider"
 import { RouterProvider } from "react-router-dom"
 import { router } from "@/router"
-import { PowerProvider } from "../PowerProvider"
+import { PowerProvider } from "@/providers/power-provider"
 
 export default function App() {
   return (
