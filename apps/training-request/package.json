@@ -1,7 +1,9 @@
 {
-  "name": "tccd",
+  "name": "training-request",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "Training and certification request workflow with approval routing",
+  "author": "Javanian",
   "type": "module",
   "scripts": {
     "dev": "vite --port 3000 --strictPort",
@@ -9,7 +11,7 @@
     "lint": "eslint .",
     "convert:employee": "node scripts/convert-employee-xlsx.mjs",
     "preview": "vite preview",
-    "setup": "node ../scripts/setup-local.mjs",
+    "setup": "node ../../scripts/setup-local.mjs",
     "prebuild": "npm run setup",
     "predev": "npm run setup"
   },
