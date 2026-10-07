@@ -19,7 +19,7 @@ const apps = fs
 const failed = []
 for (const app of apps) {
   console.info(`\n> ${app}: npm run ${script}`)
-  const args = script === 'ci' ? ['ci'] : ['run', script]
+  const args = script === 'ci' ? ['ci'] : ['run', script, '--if-present']
   const result = spawnSync('npm', args, { cwd: path.join(appsDirectory, app), stdio: 'inherit', shell: process.platform === 'win32' })
   if (result.status !== 0) failed.push(app)
 }

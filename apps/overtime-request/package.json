@@ -1,0 +1,40 @@
+{
+  "name": "overtime-request",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Digital overtime order (SPL): request, approval and payroll recap for shop-floor teams",
+  "author": "Javanian",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 3000 --strictPort",
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "setup": "node ../../scripts/setup-local.mjs",
+    "prebuild": "npm run setup",
+    "predev": "npm run setup",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@microsoft/power-apps": "^1.1.9",
+    "lucide-react": "^1.14.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@microsoft/power-apps-vite": "^1.0.2",
+    "@types/node": "^24.10.1",
+    "@types/react": "^19.2.5",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.1",
+    "eslint": "^9.39.1",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.4.24",
+    "globals": "^16.5.0",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.46.4",
+    "vite": "^7.2.4",
+    "vitest": "^3.2.7"
+  }
+}

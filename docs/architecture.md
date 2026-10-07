@@ -4,7 +4,7 @@ This document describes how the applications in this repository are structured a
 
 ## Runtime model
 
-All four applications are Power Apps **code apps**: static single-page applications built with Vite and published to a Power Platform environment. At runtime the Power Apps host loads the bundle, signs the user in and exposes connectors through the `@microsoft/power-apps` SDK.
+All five applications are Power Apps **code apps**: static single-page applications built with Vite and published to a Power Platform environment. At runtime the Power Apps host loads the bundle, signs the user in and exposes connectors through the `@microsoft/power-apps` SDK.
 
 ```mermaid
 sequenceDiagram
@@ -78,6 +78,16 @@ Flow: **Ticket list → Ticket detail**
 - A lightweight material index (only the columns needed for counts) loads with the ticket list; full material rows are fetched in chunked OData `or` filters when a ticket is opened.
 - User input in filters is escaped before it is placed in OData expressions.
 
+### Overtime Request (`apps/overtime-request`)
+
+Flow: **Pengajuan (supervisor) → Persetujuan (manager) → Rekap (HR)**
+
+- `src/domain/overtime.ts` contains every business rule as pure functions: duration including shifts that cross midnight, the 4-hour daily and 18-hour weekly limits from PP 35/2021, Monday-based week grouping, the monthly recap and CSV export. `overtime.test.ts` covers them with Vitest and runs in CI.
+- `src/data/overtimeRepository.ts` is the only module that talks to the Power Apps SDK. It maps SharePoint records to domain types and back, so the UI and the rules never see list column names.
+- Employees on an SPL are stored as JSON in one column of the request instead of a child list: one write per SPL and a single query for the recap, at the cost of not filtering per employee on the server.
+- The SPL number is derived from the list item ID (`SPL-<year>-<id>`), so it is unique without a separate counter list.
+- Validation runs while the form is filled in: errors block submission, weekly-limit warnings are shown but do not block, because the manager makes that call.
+
 ## Configuration and secrets
 
 - `power.config.json` and `.power/` hold environment-specific identifiers and are git-ignored. Tracked `*.example` files contain placeholders and are copied into place by `scripts/setup-local.mjs`.
@@ -85,10 +95,10 @@ Flow: **Ticket list → Ticket detail**
 
 ## Continuous integration
 
-`.github/workflows/ci.yml` runs a matrix job per application: `npm ci`, `npm run lint`, then `npm run build` (TypeScript project build plus Vite production build). The build uses the example descriptors, so CI needs no tenant access.
+`.github/workflows/ci.yml` runs a matrix job per application: `npm ci`, `npm run lint`, `npm run test` where an app defines it, then `npm run build` (TypeScript project build plus Vite production build). The build uses the example descriptors, so CI needs no tenant access.
 
 ## Known trade-offs
 
 - **Separate lockfiles per app** keep deployments independent but duplicate dependency updates. npm workspaces would reduce duplication at the cost of coupling releases.
 - **Bundled employee lookup** (TCCD) avoids a connector round-trip per lookup but ships the data to every client.
-- **No automated UI tests.** Behavior against live connectors is verified manually in a Power Platform environment.
+- **Unit tests cover domain rules only.** There are no automated UI tests; behavior against live connectors is verified manually in a Power Platform environment.

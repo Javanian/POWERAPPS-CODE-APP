@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/javanian/powerapps-code-app/actions/workflows/ci.yml/badge.svg)](https://github.com/javanian/powerapps-code-app/actions/workflows/ci.yml)
 
-Four business workflow applications built as **Microsoft Power Apps code apps** with React 19 and TypeScript. Each app is a typed frontend that runs inside the Power Apps host and works on SharePoint lists and Power Automate flows.
+Five business workflow applications for manufacturing operations, built as **Microsoft Power Apps code apps** with React 19 and TypeScript. Each app is a typed frontend that runs inside the Power Apps host and works on SharePoint lists and Power Automate flows.
 
 | Application | Workflow | Key capabilities |
 | --- | --- | --- |
@@ -10,6 +10,7 @@ Four business workflow applications built as **Microsoft Power Apps code apps** 
 | [**TCCD Training Request**](apps/training-request/) | Training and certification requests | Request and participant entry, multi-step approval routing, admin portal, PIC assignment notifications |
 | [**Vehicle Mileage**](apps/vehicle-mileage/) | Operational vehicle trips | Vehicle and driver selection, trip distance calculation and validation, report view |
 | [**Unblock Material**](apps/unblock-material/) | Material unblock tickets | Ticket search, status filters, pagination, lazily loaded material details |
+| [**Overtime Request**](apps/overtime-request/) | Overtime orders (SPL) | Digital SPL with automatic duration, daily and weekly overtime limits, one-tap approval, monthly payroll recap with CSV export |
 
 ## Screenshots
 
@@ -25,13 +26,25 @@ Multi-level approval: admins pick approvers and drag them into order, then every
 
 ![TCCD request list with status filter](docs/screenshots/training-request-list.jpg)
 
+### Overtime Request
+
+Replaces the paper overtime order (SPL). Supervisors pick the shift, time and team; the app calculates duration, blocks more than 4 hours per day and warns before an employee passes 18 hours in a week. Managers approve in one tap and HR exports the monthly recap for payroll.
+
+| Create an SPL | Approve |
+| --- | --- |
+| ![Overtime Request: new SPL with team and live duration](docs/screenshots/overtime-request-new.jpg) | ![Overtime Request: pending approvals](docs/screenshots/overtime-request-approvals.jpg) |
+| **Requests** | **Monthly recap** |
+| ![Overtime Request: request list with status filter](docs/screenshots/overtime-request-list.jpg) | ![Overtime Request: monthly recap per employee](docs/screenshots/overtime-request-recap.jpg) |
+
 ### Other applications
 
 | 5R Audit | 5R Audit: follow-up |
 | --- | --- |
 | ![5R Audit landing page](docs/screenshots/5r-audit-landing.jpg) | ![5R Audit follow-up list](docs/screenshots/5r-audit-follow-up.jpg) |
-| **Vehicle Mileage** | **Unblock Material** |
-| ![Vehicle Mileage report](docs/screenshots/vehicle-mileage-report.jpg) | ![Unblock Material ticket browser](docs/screenshots/unblock-material-tickets.jpg) |
+| **Vehicle Mileage** | **Vehicle Mileage: report** |
+| ![Vehicle Mileage home with trip summary](docs/screenshots/vehicle-mileage-home.jpg) | ![Vehicle Mileage report](docs/screenshots/vehicle-mileage-report.jpg) |
+| **Unblock Material** | |
+| ![Unblock Material ticket browser](docs/screenshots/unblock-material-tickets.jpg) | |
 
 ## Architecture
 
@@ -62,7 +75,9 @@ See [docs/architecture.md](docs/architecture.md) for the data flow of each appli
 - **Approval routing** (TCCD): admins compose ordered approver chains, start an approval flow and track each step's status, with client-side locks that prevent duplicate flow runs.
 - **Mobile-friendly navigation** (5R Audit): an in-app view stack is synchronized with browser history so that the device back gesture moves between screens instead of closing the app.
 - **Keyset pagination over large lists** (Unblock Material): tickets load in ID-ordered batches with OData filters, and related material rows are fetched in chunked `or` queries only when a ticket is opened.
-- **CI quality gate**: GitHub Actions runs ESLint, the TypeScript compiler and the production build for all four apps on every pull request.
+- **Labor rules in the domain layer** (Overtime Request): overtime duration, cross-midnight shifts, the 4-hour daily and 18-hour weekly limits and the monthly recap live in pure functions with unit tests, separate from the SharePoint data layer.
+- **One design language**: all apps share the same neutral palette, single blue accent, compact status filters and sentence-case typography, adapted to each app's styling stack (plain CSS, Tailwind v3, shadcn/ui on Tailwind v4).
+- **CI quality gate**: GitHub Actions runs ESLint, unit tests, the TypeScript compiler and the production build for all five apps on every pull request.
 
 ## Tech stack
 
@@ -72,7 +87,7 @@ See [docs/architecture.md](docs/architecture.md) for the data flow of each appli
 | Styling | Tailwind CSS (v3 and v4), shadcn/ui and Radix primitives, hand-written CSS |
 | Data and state | Power Apps SDK, TanStack Query, React Router |
 | Platform | Power Apps code apps, SharePoint Online, Power Automate, Power Apps CLI (`pac`) |
-| Tooling | ESLint 9 with typescript-eslint and react-hooks, GitHub Actions |
+| Tooling | ESLint 9 with typescript-eslint and react-hooks, Vitest, GitHub Actions |
 
 ## Repository structure
 
@@ -82,14 +97,15 @@ See [docs/architecture.md](docs/architecture.md) for the data flow of each appli
 │   ├── 5r-audit/            # Workplace audit and corrective-action follow-up
 │   ├── training-request/    # TCCD training and certification requests
 │   ├── vehicle-mileage/     # Vehicle mileage logging
-│   └── unblock-material/    # Material unblock ticket tracking
+│   ├── unblock-material/    # Material unblock ticket tracking
+│   └── overtime-request/    # Overtime order (SPL), approval and payroll recap
 ├── docs/
 │   ├── architecture.md      # Per-app data flow and design decisions
 │   └── screenshots/         # README screenshots (sample data)
 ├── scripts/
 │   ├── setup-local.mjs      # Creates local config from tracked *.example files
 │   └── run-all.mjs          # Runs an npm script in every app
-└── .github/workflows/ci.yml # Lint, type-check and build matrix
+└── .github/workflows/ci.yml # Lint, test, type-check and build matrix
 ```
 
 Each app follows the same layout:
@@ -112,6 +128,7 @@ Requirements: Node.js 24 (see `.nvmrc`) and npm.
 # Install, lint and build every app from the repository root
 npm run install:all
 npm run lint
+npm test
 npm run build
 
 # Or work on a single app
@@ -137,6 +154,7 @@ App-specific requirements:
 - **5R Audit:** audit and area-master lists, plus an upload flow that accepts `text` (file name) and `text_1` (image data URI) and returns `path`. Keep the extended descriptor registered in `src/powerAppsClient.ts` when regenerating connectors.
 - **TCCD Training Request:** request, participant, member, division-head, personnel and approval lists, plus approval and notification flows. Employee lookup data is bundled into the frontend, so only use data that every app user may see. Convert an authorized workbook with `npm run convert:employee -- <path-to-xlsx>`.
 - **Vehicle Mileage:** mileage, driver and vehicle lists.
+- **Overtime Request:** `overtime request` and `overtime employee` lists (columns are listed in the [app README](apps/overtime-request/README.md)). Restrict who can change `Status` with list permissions or a flow.
 - **Unblock Material:** ticket and material lists linked through `IDTICKET`. The example descriptor has no operations; generate a real one before querying. `scripts/add-sharepoint-data-sources.ps1` registers both lists after CLI authentication.
 
 ## Security notes
@@ -147,7 +165,7 @@ App-specific requirements:
 ## Scope and limitations
 
 - Flow definitions and SharePoint list provisioning are not part of this repository.
-- CI verifies linting, type-checking and production builds. It does not exercise live connectors, tenant permissions, approvals or uploads, and there are no automated UI tests yet.
+- CI verifies linting, unit tests (Overtime Request domain rules), type-checking and production builds. It does not exercise live connectors, tenant permissions, approvals or uploads, and there are no automated UI tests yet.
 - 5R Audit and Vehicle Mileage produce bundles larger than Vite's 500 kB warning threshold; code splitting is a known improvement.
 - User-facing text is in Indonesian.
 
