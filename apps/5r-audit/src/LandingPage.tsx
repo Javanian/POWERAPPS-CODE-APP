@@ -48,7 +48,7 @@ export function LandingPage({ theme, onToggleTheme, onOpenAuditor, onOpenFollowU
           <span className="lp-mote" aria-hidden="true" />
           <span className="lp-mote" aria-hidden="true" />
           <div className="lp-gear-wrap">
-            <img className="lp-gear" src={gearLogo} alt="Logo 5S — Sort, Set-in-Order, Shine, Standardize, Sustain" />
+            <img className="lp-gear" src={gearLogo} alt="Roda 5R: Ringkas, Rapi, Resik, Rawat, Rajin" />
           </div>
         </div>
 
