@@ -11,6 +11,18 @@ Four business workflow applications built as **Microsoft Power Apps code apps** 
 | [**Vehicle Mileage**](apps/vehicle-mileage/) | Operational vehicle trips | Vehicle and driver selection, trip distance calculation and validation, report view |
 | [**Unblock Material**](apps/unblock-material/) | Material unblock tickets | Ticket search, status filters, pagination, lazily loaded material details |
 
+## Screenshots
+
+Captured from production builds of each app with the Power Apps SDK replaced by sample data. All names and records are fictional.
+
+| 5R Audit | 5R Audit: follow-up |
+| --- | --- |
+| ![5R Audit landing page](docs/screenshots/5r-audit-landing.jpg) | ![5R Audit follow-up list](docs/screenshots/5r-audit-follow-up.jpg) |
+| **TCCD Training Request** | **Vehicle Mileage** |
+| ![TCCD training request list](docs/screenshots/training-request-list.jpg) | ![Vehicle Mileage report](docs/screenshots/vehicle-mileage-report.jpg) |
+| **Unblock Material** | |
+| ![Unblock Material ticket browser](docs/screenshots/unblock-material-tickets.jpg) | |
+
 ## Architecture
 
 ```mermaid
@@ -62,7 +74,8 @@ See [docs/architecture.md](docs/architecture.md) for the data flow of each appli
 │   ├── vehicle-mileage/     # Vehicle mileage logging
 │   └── unblock-material/    # Material unblock ticket tracking
 ├── docs/
-│   └── architecture.md      # Per-app data flow and design decisions
+│   ├── architecture.md      # Per-app data flow and design decisions
+│   └── screenshots/         # README screenshots (sample data)
 ├── scripts/
 │   ├── setup-local.mjs      # Creates local config from tracked *.example files
 │   └── run-all.mjs          # Runs an npm script in every app
