@@ -53,16 +53,20 @@ export function TccdRequestForm() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    const controller = new AbortController()
+    let cancelled = false
 
-    loadEmployeeLookup(controller.signal)
+    loadEmployeeLookup()
       .then((lookupData) => {
+        if (cancelled) {
+          return
+        }
+
         setEmployeeLookup(lookupData)
         setLookupStatus('ready')
         setLookupError(null)
       })
       .catch((caughtError: unknown) => {
-        if (controller.signal.aborted) {
+        if (cancelled) {
           return
         }
 
@@ -70,7 +74,9 @@ export function TccdRequestForm() {
         setLookupError(caughtError instanceof Error ? caughtError.message : 'Employee lookup gagal dimuat.')
       })
 
-    return () => controller.abort()
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   const requestErrors = useMemo(() => validateRequestForm(values), [values])

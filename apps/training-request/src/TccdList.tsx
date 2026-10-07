@@ -148,45 +148,36 @@ export function TccdList() {
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  async function loadRequests(showInitialLoading = true) {
-    if (showInitialLoading) {
-      setIsLoading(true)
-    } else {
-      setIsRefreshing(true)
-    }
+  // Sets state only after the requests resolve, so it is safe to call from the mount effect.
+  function fetchRequests() {
+    return getCurrentPowerAppsUser()
+      .then(async (user) => {
+        const userRequests = await getRequestsForUser(user)
+
+        setCurrentUser(user)
+        setRequests(userRequests)
+        setPage(1)
+      })
+      .catch((caughtError: unknown) => {
+        setCurrentUser(null)
+        setRequests([])
+        setError(getReadableError(caughtError))
+      })
+  }
+
+  function refreshRequests() {
+    setIsRefreshing(true)
     setError(null)
-
-    try {
-      const user = await getCurrentPowerAppsUser()
-      const userRequests = await getRequestsForUser(user)
-
-      setCurrentUser(user)
-      setRequests(userRequests)
-      setPage(1)
-    } catch (caughtError) {
-      setCurrentUser(null)
-      setRequests([])
-      setError(getReadableError(caughtError))
-    } finally {
-      if (showInitialLoading) {
-        setIsLoading(false)
-      } else {
-        setIsRefreshing(false)
-      }
-    }
+    void fetchRequests().finally(() => setIsRefreshing(false))
   }
 
   useEffect(() => {
-    void loadRequests()
+    void fetchRequests().finally(() => setIsLoading(false))
   }, [])
 
   useEffect(() => {
-    if (!selectedRow?.tccdNo) {
-      setParticipants([])
-      setParticipantError(null)
-      setIsParticipantLoading(false)
-      return
-    }
+    // openDetail/closeDetail reset the detail state; this effect only fetches.
+    if (!selectedRow?.tccdNo) return
 
     const activeTccdNo = selectedRow.tccdNo
     let isMounted = true
@@ -221,11 +212,7 @@ export function TccdList() {
   }, [selectedRow])
 
   useEffect(() => {
-    if (!selectedRow?.tccdNo) {
-      setApprovalSteps([])
-      setApprovalError(null)
-      return
-    }
+    if (!selectedRow?.tccdNo) return
 
     const activeTccdNo = selectedRow.tccdNo
     let isMounted = true
@@ -294,6 +281,8 @@ export function TccdList() {
     setParticipantError(null)
     setApprovalSteps([])
     setApprovalError(null)
+    setIsParticipantLoading(false)
+    setIsApprovalLoading(false)
     setDetailActionError(null)
   }
 
@@ -417,7 +406,7 @@ export function TccdList() {
           <button
             type="button"
             className="refresh-data-button"
-            onClick={() => void loadRequests(false)}
+            onClick={refreshRequests}
             disabled={isRefreshing || isLoading}
           >
             <RefreshCw size={16} strokeWidth={2.2} aria-hidden="true" />
