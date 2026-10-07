@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import {
   Ban,
@@ -180,6 +180,21 @@ const learningOptions = [
 
 const adminPageSize = 15
 
+// Error state whose setter also raises an error toast whenever a message is set.
+function useToastedError(showToast: (type: ToastType, message: string) => void) {
+  const [message, setMessage] = useState<string | null>(null)
+
+  const setError = useCallback(
+    (nextMessage: string | null) => {
+      setMessage(nextMessage)
+      if (nextMessage) showToast('error', nextMessage)
+    },
+    [showToast],
+  )
+
+  return [message, setError] as const
+}
+
 export function AdminPortal() {
   const [adminUser, setAdminUser] = useState<AdminUser | null>(null)
   const [members, setMembers] = useState<MemberTCCDRead[]>([])
@@ -204,88 +219,87 @@ export function AdminPortal() {
   const [isFlowRunning, setIsFlowRunning] = useState(false)
   const [approvalChainSteps, setApprovalChainSteps] = useState<ApproverStep[]>([])
   const [isApprovalChainLoading, setIsApprovalChainLoading] = useState(false)
-  const [approvalChainError, setApprovalChainError] = useState<string | null>(null)
   const [editingParticipantId, setEditingParticipantId] = useState<string | null>(null)
   const [editParticipantForm, setEditParticipantForm] = useState<ParticipantEditRow | null>(null)
   const [isAddingParticipant, setIsAddingParticipant] = useState(false)
   const [newParticipantForm, setNewParticipantForm] = useState<ParticipantEditRow>(emptyParticipantRow())
   const [isParticipantSaving, setIsParticipantSaving] = useState(false)
   const [employeeLookup, setEmployeeLookup] = useState<EmployeeLookupData | null>(null)
-  const [participantActionError, setParticipantActionError] = useState<string | null>(null)
-  const [error, setError] = useState<string | null>(null)
-  const [detailError, setDetailError] = useState<string | null>(null)
-  const [routingError, setRoutingError] = useState<string | null>(null)
   const [toasts, setToasts] = useState<ToastMessage[]>([])
+
+  const dismissToast = useCallback((id: string) => {
+    setToasts((current) => current.filter((toast) => toast.id !== id))
+  }, [])
+
+  const showToast = useCallback(
+    (type: ToastType, message: string) => {
+      const id = `${Date.now()}-${Math.random().toString(36).slice(2)}`
+
+      setToasts((current) => [...current.slice(-3), { id, type, message }])
+      window.setTimeout(() => dismissToast(id), 5200)
+    },
+    [dismissToast],
+  )
+
+  const [participantActionError, setParticipantActionError] = useToastedError(showToast)
+  const [error, setError] = useToastedError(showToast)
+  const [detailError, setDetailError] = useToastedError(showToast)
+  const [routingError, setRoutingError] = useToastedError(showToast)
   const [approvalRunLocks, setApprovalRunLocks] = useState<Set<string>>(() => new Set())
+  const [approvalChainError, setApprovalChainError] = useToastedError(showToast)
 
   useEffect(() => {
-    loadEmployeeLookup(new AbortController().signal)
+    loadEmployeeLookup()
       .then(setEmployeeLookup)
       .catch(() => {})
   }, [])
 
-  function dismissToast(id: string) {
-    setToasts((current) => current.filter((toast) => toast.id !== id))
-  }
+  // Sets state only after the requests resolve, so it is safe to call from the mount effect.
+  const fetchAdminData = useCallback(
+    () =>
+      getCurrentAdminUser()
+        .then(async ({ user, members: memberRows }) => {
+          const requestRows = await getAdminRequests()
 
-  function showToast(type: ToastType, message: string) {
-    const id = `${Date.now()}-${Math.random().toString(36).slice(2)}`
+          setAdminUser(user)
+          setMembers(memberRows)
+          setRequests(requestRows)
+          setPage(1)
+          return true
+        })
+        .catch((caughtError: unknown) => {
+          setAdminUser(null)
+          setMembers([])
+          setRequests([])
+          setError(getPowerAppsErrorMessage(caughtError, 'Portal Admin belum bisa dibuka'))
+          return false
+        }),
+    [setError],
+  )
 
-    setToasts((current) => [...current.slice(-3), { id, type, message }])
-    window.setTimeout(() => dismissToast(id), 5200)
-  }
-
-  useEffect(() => {
-    const latestError = detailError || routingError || participantActionError || approvalChainError || error
-
-    if (latestError) {
-      showToast('error', latestError)
-    }
-  }, [detailError, routingError, participantActionError, approvalChainError, error])
-
-  async function loadAdminData(showInitialLoading = true) {
-    if (showInitialLoading) {
-      setIsLoading(true)
-    } else {
-      setIsRefreshing(true)
-    }
+  function refreshAdminData() {
+    setIsRefreshing(true)
     setError(null)
-
-    try {
-      const { user, members: memberRows } = await getCurrentAdminUser()
-      const requestRows = await getAdminRequests()
-
-      setAdminUser(user)
-      setMembers(memberRows)
-      setRequests(requestRows)
-      setPage(1)
-      if (!showInitialLoading) {
-        showToast('success', 'Data admin berhasil direfresh.')
-      }
-    } catch (caughtError) {
-      setAdminUser(null)
-      setMembers([])
-      setRequests([])
-      setError(getPowerAppsErrorMessage(caughtError, 'Portal Admin belum bisa dibuka'))
-    } finally {
-      if (showInitialLoading) {
-        setIsLoading(false)
-      } else {
-        setIsRefreshing(false)
-      }
-    }
+    void fetchAdminData()
+      .then((loaded) => {
+        if (loaded) showToast('success', 'Data admin berhasil direfresh.')
+      })
+      .finally(() => setIsRefreshing(false))
   }
 
   useEffect(() => {
-    void loadAdminData()
-  }, [])
+    void fetchAdminData().finally(() => setIsLoading(false))
+  }, [fetchAdminData])
+
+  // Read inside the approval-chain effect without re-running it when the list is cached.
+  const approversRef = useRef(approvers)
+  useEffect(() => {
+    approversRef.current = approvers
+  }, [approvers])
 
   useEffect(() => {
-    if (!selectedRow?.tccdNo) {
-      setApprovalChainSteps([])
-      setApprovalChainError(null)
-      return
-    }
+    // openDetail/closeDetail reset the detail state; this effect only fetches.
+    if (!selectedRow?.tccdNo) return
 
     const activeTccdNo = selectedRow.tccdNo
     let isMounted = true
@@ -297,6 +311,7 @@ export function AdminPortal() {
       try {
         const steps = await getApprovalChainSteps(activeTccdNo)
         const needsPhotoFallback = steps.some((step) => !step.photoUrl)
+        const approvers = approversRef.current
         const masterApprovers = needsPhotoFallback
           ? approvers.length > 0
             ? approvers
@@ -327,7 +342,7 @@ export function AdminPortal() {
     return () => {
       isMounted = false
     }
-  }, [selectedRow])
+  }, [selectedRow, setApprovalChainError])
 
   const rows = useMemo(() => requests.map(mapAdminRow).sort((a, b) => b.rawDate - a.rawDate), [requests])
   const filteredRows = useMemo(
@@ -375,6 +390,7 @@ export function AdminPortal() {
     setRoutingError(null)
     setApprovalChainSteps([])
     setApprovalChainError(null)
+    setIsApprovalChainLoading(false)
     setEditingParticipantId(null)
     setEditParticipantForm(null)
     setIsAddingParticipant(false)
@@ -1000,7 +1016,7 @@ export function AdminPortal() {
           <button
             type="button"
             className="refresh-data-button"
-            onClick={() => void loadAdminData(false)}
+            onClick={refreshAdminData}
             disabled={isRefreshing || isLoading}
           >
             <RefreshCw size={16} strokeWidth={2.2} aria-hidden="true" />
