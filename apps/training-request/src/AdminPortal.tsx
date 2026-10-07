@@ -13,6 +13,7 @@ import {
   RefreshCw,
   Send,
   UserCheck,
+  X,
   XCircle,
 } from 'lucide-react'
 import {
@@ -986,9 +987,6 @@ export function AdminPortal() {
     return (
       <section className="admin-page section-container">
         <ToastStack toasts={toasts} onDismiss={dismissToast} />
-        <a className="back-link" href="#/">
-          Kembali ke landing
-        </a>
         <div className="admin-denied-card">
           <span>Akses ditolak</span>
           <h1>Portal Admin hanya untuk member TCCD.</h1>
@@ -1003,9 +1001,6 @@ export function AdminPortal() {
       <ToastStack toasts={toasts} onDismiss={dismissToast} />
       <div className="admin-hero">
         <div>
-          <a className="back-link" href="#/">
-            Kembali ke landing
-          </a>
           <h1>Portal Admin TCCD</h1>
           <p>Kelola assignment PIC, detail request, participant, dan routing approval.</p>
           <span className="request-scope">
@@ -1023,7 +1018,7 @@ export function AdminPortal() {
             {isRefreshing ? 'Refreshing...' : 'Refresh'}
           </button>
           <a className="create-request-button" href="#/request-form">
-            Create Request
+            Buat Pengajuan
           </a>
         </div>
       </div>
@@ -1045,7 +1040,7 @@ export function AdminPortal() {
 
       <div className="admin-toolbar">
         <label className="search-field">
-          <span>Search</span>
+          <span>Cari</span>
           <input
             type="search"
             value={search}
@@ -1190,7 +1185,7 @@ function ToastStack({
         <div key={toast.id} className={`toast-notification toast-notification-${toast.type}`}>
           <span>{toast.message}</span>
           <button type="button" onClick={() => onDismiss(toast.id)} aria-label="Tutup notifikasi">
-            X
+            <X size={16} strokeWidth={2.2} aria-hidden="true" />
           </button>
         </div>
       ))}
@@ -1501,7 +1496,7 @@ function AdminDetailPanel({
             <h3>{row.title}</h3>
           </div>
           <button type="button" className="detail-close-button" onClick={onClose} aria-label="Tutup detail">
-            X
+            <X size={18} strokeWidth={2.2} aria-hidden="true" />
           </button>
         </div>
 
@@ -1860,7 +1855,7 @@ function SidePanel({
         <div className="admin-side-panel-actions">
           {action}
           <button type="button" className="detail-close-button" onClick={onClose} aria-label={`Tutup ${title}`}>
-            X
+            <X size={18} strokeWidth={2.2} aria-hidden="true" />
           </button>
         </div>
       </div>

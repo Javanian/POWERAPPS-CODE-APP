@@ -393,9 +393,6 @@ export function TccdList() {
     <section className="request-list-section section-container">
       <div className="admin-hero">
         <div>
-          <a className="back-link" href="#/">
-            Kembali ke Halaman Utama
-          </a>
           <h1>Data Pengajuan Training</h1>
           <p>
             Data yang tampil dibatasi hanya untuk pengajuan yang dibuat oleh user login.

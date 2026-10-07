@@ -1,8 +1,9 @@
 import './App.css'
+import './theme.css'
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import type { Variants } from 'framer-motion'
-import { Calendar, Database, Target, FileText, ExternalLink } from 'lucide-react'
+import { Calendar, Database, Target, FileText, ExternalLink, GraduationCap, ArrowRight } from 'lucide-react'
 import { getContext } from '@microsoft/power-apps/app'
 import { AdminPortal } from './AdminPortal'
 import { TccdList } from './TccdList'
@@ -46,30 +47,26 @@ type ResourceLink = {
 type Page = 'home' | 'requests' | 'request-form' | 'admin'
 
 const fadeLeft: Variants = {
-  hidden: { opacity: 0, x: -50, scale: 0.95, filter: 'blur(4px)' },
+  hidden: { opacity: 0, y: 12 },
   show: (index: number = 0) => ({
     opacity: 1,
-    x: 0,
-    scale: 1,
-    filter: 'blur(0px)',
+    y: 0,
     transition: {
-      delay: index * 0.12,
-      duration: 0.6,
+      delay: index * 0.06,
+      duration: 0.4,
       ease: 'easeOut',
     },
   }),
 }
 
 const fadeRight: Variants = {
-  hidden: { opacity: 0, x: 50, scale: 0.95, filter: 'blur(4px)' },
+  hidden: { opacity: 0, y: 12 },
   show: (index: number = 0) => ({
     opacity: 1,
-    x: 0,
-    scale: 1,
-    filter: 'blur(0px)',
+    y: 0,
     transition: {
-      delay: index * 0.12,
-      duration: 0.6,
+      delay: index * 0.06,
+      duration: 0.4,
       ease: 'easeOut',
     },
   }),
@@ -134,7 +131,7 @@ const steps: Step[] = [
 
 const resourceLinks: ResourceLink[] = [
   {
-    title: 'Training Calender',
+    title: 'Training Calendar',
     description: 'Lihat jadwal training yang tersedia dan rencana pelaksanaan terbaru.',
     url: 'https://example.com/training-calendar',
     icon: 'calendar',
@@ -230,11 +227,67 @@ function App() {
 
   return (
     <main className="app-shell">
+      <AppHeader page={page} userName={userName} canOpenAdminPortal={canOpenAdminPortal} />
       {page === 'home' ? <LandingPage userName={userName} canOpenAdminPortal={canOpenAdminPortal} /> : null}
       {page === 'requests' ? <TccdList /> : null}
       {page === 'request-form' ? <TccdRequestForm /> : null}
       {page === 'admin' ? <AdminPortal /> : null}
     </main>
+  )
+}
+
+const navItems: { page: Page; label: string; href: string; adminOnly?: boolean }[] = [
+  { page: 'home', label: 'Beranda', href: '#/' },
+  { page: 'requests', label: 'Pengajuan Saya', href: '#/requests' },
+  { page: 'request-form', label: 'Buat Pengajuan', href: '#/request-form' },
+  { page: 'admin', label: 'Portal Admin', href: '#/admin', adminOnly: true },
+]
+
+function AppHeader({
+  page,
+  userName,
+  canOpenAdminPortal,
+}: {
+  page: Page
+  userName: string
+  canOpenAdminPortal: boolean
+}) {
+  const displayName = formatUserName(userName)
+
+  return (
+    <header className="app-header">
+      <div className="app-header-inner section-container">
+        <a className="app-brand" href="#/" aria-label="TCCD beranda">
+          <span className="app-brand-mark" aria-hidden="true">
+            <GraduationCap size={18} strokeWidth={2.2} />
+          </span>
+          <span className="app-brand-text">
+            <strong>TCCD</strong>
+            <span>Training &amp; Certification</span>
+          </span>
+        </a>
+        <nav className="app-nav" aria-label="Navigasi utama">
+          {navItems
+            .filter((item) => !item.adminOnly || canOpenAdminPortal)
+            .map((item) => (
+              <a
+                key={item.page}
+                className={`app-nav-link ${page === item.page ? 'app-nav-link-active' : ''}`}
+                href={item.href}
+                aria-current={page === item.page ? 'page' : undefined}
+              >
+                {item.label}
+              </a>
+            ))}
+        </nav>
+        <span className="app-user" title={displayName}>
+          <span className="app-user-avatar" aria-hidden="true">
+            {getInitials(displayName)}
+          </span>
+          <span className="app-user-name">{displayName}</span>
+        </span>
+      </div>
+    </header>
   )
 }
 
@@ -262,98 +315,48 @@ function HeroSection({
   userName: string
   canOpenAdminPortal: boolean
 }) {
-  return (
-    <section className="hero-section section-container" id="hero">
-      <div className="hero-copy">
-        {/* <p className="hero-eyebrow">Internal Training Request Portal</p> */}
-        <h1>
-          <span>Training & Certification</span>
-          <span>Control Document</span>
-        </h1>
-        <p className="hero-lead">
-          Aplikasi resmi perusahaan untuk pengajuan training dan sertifikasi internal maupun eksternal 
-          yang dikelola oleh tim Learning & Development.
-          
-        </p>
-        <div className="hero-proof" aria-label="Keunggulan TCCD">
-          {/* <span>SharePoint connected</span>
-          <span>Power Apps ready</span>
-          <span>Participant tracking</span> */}
-        </div>
-      </div>
-      <TrainingRequestPreview userName={userName} canOpenAdminPortal={canOpenAdminPortal} />
-    </section>
-  )
-}
-
-function TrainingRequestPreview({
-  userName,
-  canOpenAdminPortal,
-}: {
-  userName: string
-  canOpenAdminPortal: boolean
-}) {
   const displayName = formatUserName(userName)
 
   return (
-    <aside className="request-preview landing-dashboard" aria-label="Ringkasan portal TCCD">
-      <div className="dashboard-glow" aria-hidden="true" />
-      <div className="dashboard-topbar">
-        <div className="dashboard-window-controls" aria-hidden="true">
-          <span />
-          <span />
-          <span />
-        </div>
-        <span className="dashboard-status">
-          <span className="status-pulse" />
-          
-        </span>
-      </div>
-
+    <section className="hero-section section-container" id="hero">
       <motion.div
-        className="dashboard-greeting"
-        initial={{ opacity: 0, y: 16 }}
+        className="hero-copy"
+        initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5, duration: 0.5 }}
+        transition={{ duration: 0.4, ease: 'easeOut' }}
       >
-        <div>
-          <h2>
-            {getTimeGreeting()}, {displayName}
-          </h2>
-        </div>
-        <div className="greeting-avatar" aria-hidden="true">
-          {getInitials(displayName)}
-        </div>
-      </motion.div>
-
-      <div className="dashboard-resource-panel" aria-label="Navigasi resource TCCD">
-        <motion.div
-          className="hero-actions"
-          aria-label="Aksi utama"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6, duration: 0.5 }}
-        >
+        <span className="hero-greeting">
+          {getTimeGreeting()}, {displayName}
+        </span>
+        <h1>Training &amp; Certification Control Document</h1>
+        <p className="hero-lead">
+          Ajukan training dan sertifikasi internal maupun eksternal, pantau status persetujuan, dan kelola
+          peserta dalam satu tempat bersama tim Learning &amp; Development.
+        </p>
+        <div className="hero-actions" aria-label="Aksi utama">
           <a className="primary-button" href="#/request-form">
             Buat Pengajuan
+            <ArrowRight size={16} strokeWidth={2.2} aria-hidden="true" />
           </a>
           <a className="secondary-button" href="#/requests">
-            Lihat Data Pengajuan
+            Lihat Pengajuan Saya
           </a>
           {canOpenAdminPortal ? (
             <a className="admin-entry-button" href="#/admin">
               Portal Admin
             </a>
           ) : null}
-        </motion.div>
-        <p className="resource-panel-label">Quick access</p>
+        </div>
+      </motion.div>
+      <aside className="hero-resources" aria-label="Akses cepat">
+        <p className="resource-panel-label">Akses cepat</p>
         <div className="resource-link-grid">
           {resourceLinks.map((link, index) => (
             <ResourceLinkButton key={link.title} link={link} index={index} />
           ))}
         </div>
-      </div>
-    </aside>
+      </aside>
+    </section>
   )
 }
 
@@ -365,11 +368,9 @@ function ResourceLinkButton({ link, index }: { link: ResourceLink; index: number
       href={link.url}
       target="_blank"
       rel="noreferrer"
-      initial={{ opacity: 0, y: 18, scale: 0.96 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ delay: 0.22 + index * 0.1, duration: 0.48, ease: 'easeOut' }}
-      whileHover={{ y: -5, scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.1 + index * 0.05, duration: 0.35, ease: 'easeOut' }}
     >
       <span className="resource-link-icon">
         <span className="icon-box">
@@ -381,7 +382,7 @@ function ResourceLinkButton({ link, index }: { link: ResourceLink; index: number
         <span>{link.description}</span>
       </span>
       <span className="resource-link-arrow" aria-hidden="true">
-        &rarr;
+        <ArrowRight size={16} strokeWidth={2} />
       </span>
     </motion.a>
   )
@@ -426,16 +427,15 @@ function CallToActionSection() {
     <motion.section
       className="section-container cta-section"
       id="cta"
-      initial={{ opacity: 0, y: 50, scale: 0.96 }}
-      whileInView={{ opacity: 1, y: 0, scale: 1 }}
-      viewport={{ margin: "-40px" }}
-      transition={{ duration: 0.8, ease: [0.23, 1, 0.32, 1] }}
+      initial={{ opacity: 0, y: 12 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-40px' }}
+      transition={{ duration: 0.4, ease: 'easeOut' }}
     >
       <div className="cta-copy">
         <h2>Butuh pelatihan atau sertifikasi untuk tim Anda?</h2>
         <p>
-          
-Ajukan melalui Form TCCD agar permintaan tercatat rapi dan dapat segera diproses oleh tim Learning & Development.
+          Ajukan melalui Form TCCD agar permintaan tercatat rapi dan dapat segera diproses oleh tim Learning & Development.
         </p>
       </div>
       <a className="primary-button cta-button" href="#/request-form">
@@ -449,10 +449,10 @@ function SectionHeader({ title, description }: { title: string; description: str
   return (
     <motion.div
       className="section-header"
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 12 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{}}
-      transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.4, ease: 'easeOut' }}
     >
       <h2>{title}</h2>
       <p>{description}</p>
@@ -469,7 +469,7 @@ function GuideCard({ step, index }: { step: UserGuideStep; index: number }) {
       variants={direction}
       initial="hidden"
       whileInView="show"
-      viewport={{ amount: 0.22 }}
+      viewport={{ once: true, amount: 0.2 }}
       custom={index - 1}
     >
       <span className="guide-card-number">{index.toString().padStart(2, '0')}</span>
@@ -495,7 +495,7 @@ function ProcessStep({ step, index }: { step: Step; index: number }) {
       variants={direction}
       initial="hidden"
       whileInView="show"
-      viewport={{ amount: 0.3 }}
+      viewport={{ once: true, amount: 0.2 }}
       custom={index - 1}
     >
       <span className="step-number">{step.number}</span>
