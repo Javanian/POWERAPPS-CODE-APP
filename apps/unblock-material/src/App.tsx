@@ -117,10 +117,10 @@ const statusRailClass: Record<StatusTone, string> = {
 const statusDotClass: Record<StatusTone, string> = statusRailClass;
 
 const STATUS_FILTERS: Array<{ label: string; value: string; tone: StatusTone }> = [
-  { label: "Approve", value: "Approve", tone: "approved" },
+  { label: "Approved", value: "Approve", tone: "approved" },
   { label: "Waiting Review", value: "Waiting Review", tone: "waiting" },
-  { label: "Reject", value: "Reject", tone: "rejected" },
-  { label: "CLOSE", value: "CLOSE", tone: "closed" },
+  { label: "Rejected", value: "Reject", tone: "rejected" },
+  { label: "Closed", value: "CLOSE", tone: "closed" },
 ];
 
 function statusMatchesFilter(status: string | undefined, filterValue: string) {
@@ -133,7 +133,7 @@ function StatusPill({ status }: { status?: string }) {
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${statusPillClass[tone]}`}
+      className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[11px] font-semibold ${statusPillClass[tone]}`}
     >
       {tone === "waiting" ? <span className="status-dot-pulse h-1.5 w-1.5 rounded-full bg-current" /> : null}
       {status || "No status"}
@@ -355,7 +355,7 @@ function RequesterAvatar({ name, size = "sm" }: { name: string; size?: "sm" | "m
 
   return (
     <span
-      className={`flex ${sizeClass} flex-shrink-0 items-center justify-center rounded-full border border-slate-200 bg-[#caf0f8] font-bold text-[#023e8a] dark:border-slate-600 dark:bg-[#48cae4]/20 dark:text-[#90e0ef]`}
+      className={`flex ${sizeClass} flex-shrink-0 items-center justify-center rounded-full border border-slate-200 bg-[#dbeafe] font-bold text-[#1d4ed8] dark:border-slate-600 dark:bg-[#60a5fa]/20 dark:text-[#93c5fd]`}
       aria-hidden="true"
     >
       {getInitials(name)}
@@ -412,22 +412,22 @@ function ApprovalInfoModal({ ticket, onClose }: { ticket: UnblockMaterialTicketR
       onClick={onClose}
     >
       <div
-        className="animate-card-in w-full max-w-lg overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl dark:border-slate-700 dark:bg-[#111c2e]"
+        className="animate-card-in w-full max-w-lg overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl dark:border-slate-700 dark:bg-[#131a23]"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="flex items-start justify-between gap-3 border-b border-slate-200 px-5 py-4 dark:border-slate-800">
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-slate-400 dark:text-slate-500">
+            <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
               Riwayat persetujuan
             </p>
-            <p className="font-mono text-lg font-extrabold tabular-nums text-[#0077b6] dark:text-[#48cae4]">
+            <p className="font-mono text-lg font-extrabold tabular-nums text-[#2563eb] dark:text-[#60a5fa]">
               {ticket.Title || `ID ${ticket.ID}`}
             </p>
           </div>
           <div className="flex items-center gap-2">
             <StatusPill status={ticket.Status} />
             <button
-              className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition-all hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00b4d8] active:scale-95 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-300 dark:hover:bg-slate-800"
+              className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition-all hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#3b82f6] active:scale-95 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-300 dark:hover:bg-slate-800"
               type="button"
               aria-label="Tutup"
               onClick={onClose}
@@ -447,12 +447,12 @@ function ApprovalInfoModal({ ticket, onClose }: { ticket: UnblockMaterialTicketR
                   <span
                     className={`absolute -left-[27px] top-0.5 h-4 w-4 rounded-full border-2 ${
                       isDone
-                        ? "border-[#0077b6] bg-[#0077b6] dark:border-[#48cae4] dark:bg-[#48cae4]"
-                        : "border-slate-300 bg-white dark:border-slate-600 dark:bg-[#111c2e]"
+                        ? "border-[#2563eb] bg-[#2563eb] dark:border-[#60a5fa] dark:bg-[#60a5fa]"
+                        : "border-slate-300 bg-white dark:border-slate-600 dark:bg-[#131a23]"
                     }`}
                     aria-hidden="true"
                   />
-                  <p className="text-[10px] font-bold uppercase tracking-wide text-slate-400 dark:text-slate-500">
+                  <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
                     {step.title}
                   </p>
                   <p
@@ -476,7 +476,7 @@ function ApprovalInfoModal({ ticket, onClose }: { ticket: UnblockMaterialTicketR
 
         <div className="flex justify-end border-t border-slate-200 px-5 py-3 dark:border-slate-800">
           <button
-            className="min-h-[40px] rounded-lg bg-[#0077b6] px-4 text-sm font-semibold text-white transition-all hover:bg-[#023e8a] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00b4d8] active:scale-95 dark:hover:bg-[#0096c7]"
+            className="min-h-[40px] rounded-lg bg-[#2563eb] px-4 text-sm font-semibold text-white transition-all hover:bg-[#1d4ed8] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#3b82f6] active:scale-95 dark:hover:bg-[#1d4ed8]"
             type="button"
             onClick={onClose}
           >
@@ -909,35 +909,35 @@ function App() {
   }, [activeTicketNo, loadMaterialsForTicket]);
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden bg-[#f3f6fb] text-slate-800 transition-colors duration-300 dark:bg-[#0b1322] dark:text-slate-100">
-      <header className="animate-rise flex-shrink-0 border-b border-slate-200 bg-white shadow-sm transition-colors duration-300 dark:border-slate-800 dark:bg-[#111c2e]">
+    <div className="flex h-screen flex-col overflow-hidden bg-[#f7f8fa] text-slate-800 transition-colors duration-300 dark:bg-[#0b1017] dark:text-slate-100">
+      <header className="animate-rise flex-shrink-0 border-b border-slate-200 bg-white shadow-sm transition-colors duration-300 dark:border-slate-800 dark:bg-[#131a23]">
         <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-3 md:flex-row md:items-center md:justify-between md:px-6">
           <div className="flex items-center gap-3">
-            <span className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#0077b6] to-[#023e8a] text-white shadow-md shadow-[#0077b6]/25">
-              <PackageCheck size={22} />
+            <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-[#2563eb] text-white">
+              <PackageCheck size={18} />
             </span>
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#0077b6] dark:text-[#48cae4]">
+              <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
                 Supply Chain
               </p>
-              <h1 className="text-lg font-extrabold leading-tight text-slate-800 dark:text-slate-100 md:text-xl">
+              <h1 className="text-base font-semibold leading-tight text-slate-900 dark:text-slate-100">
                 Unblock Material
               </h1>
             </div>
             <div className="ml-2 hidden gap-2 lg:flex">
               <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-[11px] font-semibold text-slate-600 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-300">
-                <Ticket size={12} className="text-[#0077b6] dark:text-[#48cae4]" />
+                <Ticket size={12} className="text-[#2563eb] dark:text-[#60a5fa]" />
                 <span className="font-mono tabular-nums">{tickets.length}</span> ticket termuat
               </span>
               <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-[11px] font-semibold text-slate-600 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-300">
-                <Boxes size={12} className="text-[#0077b6] dark:text-[#48cae4]" />
+                <Boxes size={12} className="text-[#2563eb] dark:text-[#60a5fa]" />
                 <span className="font-mono tabular-nums">{totalIndexedMaterials}</span> material terindeks
               </span>
             </div>
           </div>
           <div className="flex flex-wrap gap-2">
             <button
-              className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 transition-all duration-150 hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00b4d8] active:scale-95 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-300 dark:hover:bg-slate-800"
+              className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 transition-all duration-150 hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#3b82f6] active:scale-95 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-300 dark:hover:bg-slate-800"
               type="button"
               aria-label={themeMode === "light" ? "Ganti ke mode gelap" : "Ganti ke mode terang"}
               onClick={() => setThemeMode((mode) => (mode === "light" ? "dark" : "light"))}
@@ -945,7 +945,7 @@ function App() {
               {themeMode === "light" ? <Moon size={17} /> : <Sun size={17} />}
             </button>
             <button
-              className="flex min-h-[44px] items-center justify-center gap-1.5 rounded-lg bg-[#0077b6] px-4 py-2 text-sm font-semibold text-white transition-all duration-150 hover:bg-[#023e8a] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00b4d8] active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-[#0096c7]"
+              className="flex min-h-[44px] items-center justify-center gap-1.5 rounded-lg bg-[#2563eb] px-4 py-2 text-sm font-semibold text-white transition-all duration-150 hover:bg-[#1d4ed8] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#3b82f6] active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-[#1d4ed8]"
               type="button"
               disabled={isLoading}
               onClick={() => void loadSharePointData()}
@@ -954,7 +954,7 @@ function App() {
               Refresh
             </button>
             <a
-              className="flex min-h-[44px] items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition-all duration-150 hover:border-slate-300 hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00b4d8] active:scale-95 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-200 dark:hover:bg-slate-800"
+              className="flex min-h-[44px] items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition-all duration-150 hover:border-slate-300 hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#3b82f6] active:scale-95 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-200 dark:hover:bg-slate-800"
               href={SHAREPOINT_LISTS[1].url}
               target="_blank"
               rel="noreferrer"
@@ -978,17 +978,17 @@ function App() {
 
       <main className="mx-auto grid min-h-0 w-full max-w-7xl flex-1 gap-4 overflow-hidden px-4 py-4 md:grid-cols-[390px_1fr] md:px-6">
         <section
-          className="animate-rise flex min-h-0 flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-colors duration-300 dark:border-slate-800 dark:bg-[#111c2e]"
+          className="animate-rise flex min-h-0 flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-colors duration-300 dark:border-slate-800 dark:bg-[#131a23]"
           style={{ animationDelay: "60ms" }}
         >
           <div className="border-b border-slate-200 px-4 py-3 dark:border-slate-800">
             <div className="mb-3 flex items-center justify-between gap-3">
               <div className="flex items-center gap-2">
-                <Ticket size={18} className="text-[#0077b6] dark:text-[#48cae4]" />
-                <h2 className="text-sm font-bold uppercase tracking-wide text-slate-700 dark:text-slate-300">Tickets</h2>
+                <Ticket size={18} className="text-[#2563eb] dark:text-[#60a5fa]" />
+                <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Tickets</h2>
               </div>
               <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 font-mono text-[10px] font-bold tabular-nums text-slate-600 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-300">
-                {displayedTickets.length} {isSearchMode ? "hasil" : "rows"}
+                {displayedTickets.length} {isSearchMode ? "hasil" : "tiket"}
               </span>
             </div>
 
@@ -999,7 +999,7 @@ function App() {
                 void runTicketSearch(searchInput, statusFilter);
               }}
             >
-              <label className="flex min-h-[44px] flex-1 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 transition-colors focus-within:border-[#0096c7] focus-within:ring-2 focus-within:ring-[#00b4d8] dark:border-slate-700 dark:bg-slate-800/60">
+              <label className="flex min-h-[44px] flex-1 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 transition-colors focus-within:border-[#1d4ed8] focus-within:ring-2 focus-within:ring-[#3b82f6] dark:border-slate-700 dark:bg-slate-800/60">
                 <Search size={16} className="text-slate-400" />
                 <input
                   className="w-full bg-transparent text-sm text-slate-800 placeholder-slate-400 focus:outline-none dark:text-slate-100 dark:placeholder-slate-500"
@@ -1009,7 +1009,7 @@ function App() {
                 />
               </label>
               <button
-                className="flex min-h-[44px] items-center justify-center gap-1.5 rounded-lg bg-[#0077b6] px-4 py-2 text-sm font-semibold text-white transition-all duration-150 hover:bg-[#023e8a] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00b4d8] active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-[#0096c7]"
+                className="flex min-h-[44px] items-center justify-center gap-1.5 rounded-lg bg-[#2563eb] px-4 py-2 text-sm font-semibold text-white transition-all duration-150 hover:bg-[#1d4ed8] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#3b82f6] active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-[#1d4ed8]"
                 type="submit"
                 disabled={isSearching}
               >
@@ -1017,7 +1017,7 @@ function App() {
               </button>
               {isSearchMode ? (
                 <button
-                  className="flex min-h-[44px] items-center justify-center rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition-all duration-150 hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00b4d8] active:scale-95 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-200 dark:hover:bg-slate-800"
+                  className="flex min-h-[44px] items-center justify-center rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition-all duration-150 hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#3b82f6] active:scale-95 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-200 dark:hover:bg-slate-800"
                   type="button"
                   onClick={() => {
                     setSearchInput("");
@@ -1039,9 +1039,9 @@ function App() {
                 return (
                   <button
                     key={item.value}
-                    className={`inline-flex min-h-[30px] items-center gap-1.5 rounded-full border px-2.5 text-[11px] font-bold transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00b4d8] active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 ${
+                    className={`inline-flex min-h-[30px] items-center gap-1.5 rounded-full border px-3 text-xs font-medium transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#3b82f6] active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 ${
                       isActiveFilter
-                        ? "border-[#0077b6] bg-[#0077b6] text-white dark:border-[#48cae4] dark:bg-[#48cae4] dark:text-slate-900"
+                        ? "border-slate-900 bg-slate-900 text-white dark:border-slate-100 dark:bg-slate-100 dark:text-slate-900"
                         : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-300 dark:hover:bg-slate-800"
                     }`}
                     type="button"
@@ -1064,7 +1064,7 @@ function App() {
             ) : null}
           </div>
 
-          <div className="min-h-0 flex-1 overflow-y-auto bg-[#f3f6fb] p-3 transition-colors duration-300 dark:bg-[#0d1626]">
+          <div className="min-h-0 flex-1 overflow-y-auto bg-[#f7f8fa] p-3 transition-colors duration-300 dark:bg-[#0f141b]">
             {isLoading && tickets.length === 0 ? (
               <TicketListSkeleton />
             ) : displayedTickets.length === 0 ? (
@@ -1093,9 +1093,9 @@ function App() {
                   return (
                     <button
                       key={ticketRow.ID ?? ticketNo}
-                      className={`animate-card-in group relative min-h-[76px] w-full overflow-hidden rounded-xl border bg-white p-3 pl-4 text-left shadow-sm transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00b4d8] active:scale-[0.99] dark:bg-slate-800/50 ${
+                      className={`animate-card-in group relative min-h-[76px] w-full overflow-hidden rounded-xl border bg-white p-3 pl-4 text-left shadow-sm transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-[#3b82f6] active:scale-[0.99] dark:bg-slate-800/50 ${
                         isActive
-                          ? "border-[#0077b6] ring-1 ring-[#00b4d8] dark:border-[#48cae4]"
+                          ? "border-[#2563eb] ring-1 ring-[#3b82f6] dark:border-[#60a5fa]"
                           : "border-slate-200 hover:border-slate-300 dark:border-slate-700 dark:hover:border-slate-600"
                       }`}
                       style={{ animationDelay: `${cardIndex * 45}ms` }}
@@ -1114,7 +1114,7 @@ function App() {
                           <RequesterAvatar name={requester.name} />
                           <div className="min-w-0">
                             <div className="mb-1 flex items-center gap-1.5">
-                              <Hash size={14} className="text-[#0077b6] dark:text-[#48cae4]" />
+                              <Hash size={14} className="text-[#2563eb] dark:text-[#60a5fa]" />
                               <span className="font-mono text-xs font-bold tabular-nums text-slate-700 dark:text-slate-200">
                                 {ticketNo || `ID ${ticketRow.ID}`}
                               </span>
@@ -1126,7 +1126,7 @@ function App() {
                         <ChevronRight
                           size={18}
                           className={`transition-transform duration-150 group-hover:translate-x-0.5 ${
-                            isActive ? "text-[#0077b6] dark:text-[#48cae4]" : "text-slate-400 dark:text-slate-500"
+                            isActive ? "text-[#2563eb] dark:text-[#60a5fa]" : "text-slate-400 dark:text-slate-500"
                           }`}
                         />
                       </div>
@@ -1143,9 +1143,9 @@ function App() {
             )}
           </div>
           {!isSearchMode && hasMoreTickets ? (
-            <div className="flex-shrink-0 border-t border-slate-200 bg-white px-4 py-2 dark:border-slate-800 dark:bg-[#111c2e]">
+            <div className="flex-shrink-0 border-t border-slate-200 bg-white px-4 py-2 dark:border-slate-800 dark:bg-[#131a23]">
               <button
-                className="flex min-h-[40px] w-full items-center justify-center gap-1.5 rounded-lg border border-dashed border-[#0077b6]/40 bg-white text-xs font-semibold text-[#0077b6] transition-all hover:bg-[#0077b6]/5 disabled:cursor-not-allowed disabled:opacity-50 dark:border-[#48cae4]/30 dark:bg-transparent dark:text-[#48cae4] dark:hover:bg-[#48cae4]/10"
+                className="flex min-h-[40px] w-full items-center justify-center gap-1.5 rounded-lg border border-dashed border-[#2563eb]/40 bg-white text-xs font-semibold text-[#2563eb] transition-all hover:bg-[#2563eb]/5 disabled:cursor-not-allowed disabled:opacity-50 dark:border-[#60a5fa]/30 dark:bg-transparent dark:text-[#60a5fa] dark:hover:bg-[#60a5fa]/10"
                 type="button"
                 disabled={isLoadingMoreTickets}
                 onClick={() => void loadMoreTickets()}
@@ -1155,7 +1155,7 @@ function App() {
               </button>
             </div>
           ) : null}
-          <div className="flex flex-shrink-0 items-center justify-between border-t border-slate-200 bg-white px-4 py-3 text-xs font-semibold text-slate-600 dark:border-slate-800 dark:bg-[#111c2e] dark:text-slate-300">
+          <div className="flex flex-shrink-0 items-center justify-between border-t border-slate-200 bg-white px-4 py-3 text-xs font-semibold text-slate-600 dark:border-slate-800 dark:bg-[#131a23] dark:text-slate-300">
             <span className="font-mono tabular-nums">
               Page {activeTicketPage} / {totalTicketPages}
             </span>
@@ -1181,7 +1181,7 @@ function App() {
         </section>
 
         <section
-          className="animate-rise min-h-0 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-colors duration-300 dark:border-slate-800 dark:bg-[#111c2e]"
+          className="animate-rise min-h-0 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-colors duration-300 dark:border-slate-800 dark:bg-[#131a23]"
           style={{ animationDelay: "120ms" }}
         >
           {selectedTicket ? (
@@ -1189,10 +1189,10 @@ function App() {
               <div className="px-4 pb-1 pt-3">
                 <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
                   <div>
-                    <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-slate-400 dark:text-slate-500">
+                    <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
                       Ticket
                     </p>
-                    <p className="font-mono text-xl font-extrabold tabular-nums text-[#0077b6] dark:text-[#48cae4]">
+                    <p className="font-mono text-xl font-extrabold tabular-nums text-[#2563eb] dark:text-[#60a5fa]">
                       {activeTicketNo || `ID ${selectedTicket.ID}`}
                     </p>
                     <h2 className="mt-2 flex items-center gap-2.5 text-lg font-extrabold text-slate-800 dark:text-slate-100">
@@ -1203,11 +1203,11 @@ function App() {
                   <div className="flex flex-shrink-0 items-center gap-2">
                     <StatusPill status={selectedTicket.Status} />
                     <button
-                      className="flex min-h-[36px] items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 transition-all duration-150 hover:border-slate-300 hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00b4d8] active:scale-95 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-200 dark:hover:bg-slate-800"
+                      className="flex min-h-[36px] items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 transition-all duration-150 hover:border-slate-300 hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#3b82f6] active:scale-95 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-200 dark:hover:bg-slate-800"
                       type="button"
                       onClick={() => setIsInfoOpen(true)}
                     >
-                      <Info size={14} className="text-[#0077b6] dark:text-[#48cae4]" />
+                      <Info size={14} className="text-[#2563eb] dark:text-[#60a5fa]" />
                       Info
                     </button>
                   </div>
@@ -1215,15 +1215,15 @@ function App() {
 
                 <div className="mt-4 flex flex-wrap gap-2 text-xs font-semibold text-slate-600 dark:text-slate-300">
                   <span className="inline-flex min-h-[32px] items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-3 dark:border-slate-700 dark:bg-slate-800/60">
-                    <UserRound size={14} className="text-[#0077b6] dark:text-[#48cae4]" />
+                    <UserRound size={14} className="text-[#2563eb] dark:text-[#60a5fa]" />
                     {selectedRequester?.email || selectedTicket.RequestBy || "-"}
                   </span>
                   <span className="inline-flex min-h-[32px] items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-3 dark:border-slate-700 dark:bg-slate-800/60">
-                    <FileText size={14} className="text-[#0077b6] dark:text-[#48cae4]" />
+                    <FileText size={14} className="text-[#2563eb] dark:text-[#60a5fa]" />
                     {selectedTicket.Review || "-"}
                   </span>
                   <span className="inline-flex min-h-[32px] items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-3 dark:border-slate-700 dark:bg-slate-800/60">
-                    <CalendarDays size={14} className="text-[#0077b6] dark:text-[#48cae4]" />
+                    <CalendarDays size={14} className="text-[#2563eb] dark:text-[#60a5fa]" />
                     {formatDate(selectedTicket.Created)}
                   </span>
                 </div>
@@ -1235,8 +1235,8 @@ function App() {
               <div className="flex min-h-0 flex-1 flex-col p-4 pt-1">
                 <div className="mb-3 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
                   <div className="flex items-center gap-2">
-                    <Boxes size={18} className="text-[#0077b6] dark:text-[#48cae4]" />
-                    <h3 className="text-sm font-bold uppercase tracking-wide text-slate-700 dark:text-slate-300">
+                    <Boxes size={18} className="text-[#2563eb] dark:text-[#60a5fa]" />
+                    <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
                       Unblock Material
                     </h3>
                   </div>
@@ -1258,11 +1258,11 @@ function App() {
                   <div className="h-full overflow-auto">
                     <table className="w-full min-w-[640px] text-sm">
                       <thead className="sticky top-0 z-10">
-                        <tr className="bg-[#eaf4fb] dark:bg-slate-800">
-                          <th className="px-3 py-2 text-left text-xs font-bold uppercase tracking-wide text-slate-600 dark:text-slate-300">Material</th>
-                          <th className="px-3 py-2 text-left text-xs font-bold uppercase tracking-wide text-slate-600 dark:text-slate-300">Description</th>
-                          <th className="px-3 py-2 text-left text-xs font-bold uppercase tracking-wide text-slate-600 dark:text-slate-300">Plant</th>
-                          <th className="px-3 py-2 text-right text-xs font-bold uppercase tracking-wide text-slate-600 dark:text-slate-300">Qty</th>
+                        <tr className="bg-[#eff6ff] dark:bg-slate-800">
+                          <th className="px-3 py-2 text-left text-xs font-medium text-slate-500 dark:text-slate-400">Material</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-slate-500 dark:text-slate-400">Description</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-slate-500 dark:text-slate-400">Plant</th>
+                          <th className="px-3 py-2 text-right text-xs font-medium text-slate-500 dark:text-slate-400">Qty</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-100 dark:divide-slate-700/60">
@@ -1338,7 +1338,7 @@ function App() {
           ) : (
             <div className="flex min-h-[320px] flex-col items-center justify-center gap-2 p-6 text-center">
               <span className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-500">
-                <PackageCheck size={22} />
+                <PackageCheck size={18} />
               </span>
               <p className="text-sm font-bold text-slate-700 dark:text-slate-200">
                 {isLoading ? "Memuat ticket..." : "Pilih ticket untuk melihat material"}
