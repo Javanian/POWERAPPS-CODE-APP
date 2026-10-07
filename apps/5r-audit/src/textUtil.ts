@@ -12,7 +12,7 @@ export function plainText(value: unknown): string {
 
   try {
     const doc = new DOMParser().parseFromString(trimmed, 'text/html')
-    return (doc.body.textContent ?? '').replace(/ /g, ' ').trim()
+    return (doc.body.textContent ?? '').replace(/\u00a0/g, ' ').trim()
   } catch {
     return trimmed.replace(/<[^>]+>/g, '').trim()
   }

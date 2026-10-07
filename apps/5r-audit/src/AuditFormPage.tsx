@@ -2,7 +2,7 @@ import './audit.css'
 import { useEffect, useMemo, useState } from 'react'
 import { ArrowLeft, Camera, CheckCircle2, Moon, Star, Sun, X } from 'lucide-react'
 import type { AuditSetup } from './AuditSetupPage'
-import { rootClassName, type Theme } from './LandingPage'
+import { rootClassName, type Theme } from './theme'
 import type { _5RNewAppsWrite } from './generated/models/_5RNewAppsModel'
 import {
   ALL_AUDIT_ITEMS,
@@ -64,15 +64,13 @@ type EvidencePickerProps = {
 }
 
 function EvidencePicker({ itemId, file, disabled, onChange }: EvidencePickerProps) {
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [preview, setPreview] = useState<{ file: File; url: string } | null>(null)
   const [pickError, setPickError] = useState<string | null>(null)
+  const previewUrl = file && preview?.file === file ? preview.url : null
 
   // Preview di-downscale async — hindari decode foto full-res di main thread.
   useEffect(() => {
-    if (!file) {
-      setPreviewUrl(null)
-      return
-    }
+    if (!file) return
 
     let cancelled = false
     let createdUrl: string | null = null
@@ -84,12 +82,10 @@ function EvidencePicker({ itemId, file, disabled, onChange }: EvidencePickerProp
           return
         }
         createdUrl = url
-        setPreviewUrl(url)
+        setPreview({ file, url })
       })
       .catch(() => {
-        if (!cancelled) {
-          setPreviewUrl(null)
-        }
+        // Preview gagal dibuat: tampilkan placeholder tanpa gambar.
       })
 
     return () => {

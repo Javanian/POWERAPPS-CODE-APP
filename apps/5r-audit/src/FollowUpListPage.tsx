@@ -2,7 +2,7 @@ import './audit.css'
 import './followup.css'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { ArrowLeft, Boxes, CalendarDays, ChevronRight, Loader2, Moon, Search, Sun, UserRound } from 'lucide-react'
-import { rootClassName, type Theme } from './LandingPage'
+import { rootClassName, type Theme } from './theme'
 import {
   getAreaAuditData,
   getDistinctFieldValues,
