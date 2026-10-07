@@ -1,20 +1,6 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react"
+import { useEffect, useState, type ReactNode } from "react"
 
-export type PowerAppStatus = "initializing" | "ready" | "error"
-
-type PowerAppContextType = {
-  status: PowerAppStatus
-  error: string | null
-}
-
-const PowerAppContext = createContext<PowerAppContextType>({
-  status: "initializing",
-  error: null,
-})
-
-export function usePowerApp() {
-  return useContext(PowerAppContext)
-}
+type PowerAppStatus = "initializing" | "ready" | "error"
 
 type PowerProviderProps = {
   children: ReactNode
@@ -29,8 +15,6 @@ export function PowerProvider({ children }: PowerProviderProps) {
 
     async function initialize() {
       try {
-        if (!cancelled) setStatus("initializing")
-
         const { getContext } = await import("@microsoft/power-apps/app")
         await getContext()
 
@@ -79,9 +63,5 @@ export function PowerProvider({ children }: PowerProviderProps) {
     )
   }
 
-  return (
-    <PowerAppContext.Provider value={{ status, error }}>
-      {children}
-    </PowerAppContext.Provider>
-  )
+  return children
 }
