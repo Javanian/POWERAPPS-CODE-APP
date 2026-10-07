@@ -3,6 +3,7 @@ import type { ReactNode } from 'react'
 import {
   Ban,
   Check,
+  GripVertical,
   CheckCircle2,
   ClipboardCheck,
   Clock,
@@ -16,6 +17,7 @@ import {
   X,
   XCircle,
 } from 'lucide-react'
+import { StatusFilterBar } from './StatusFilterBar'
 import {
   ApprovalFlowTCCDService,
   ApprovalTCCDService,
@@ -1023,20 +1025,16 @@ export function AdminPortal() {
         </div>
       </div>
 
-      <div className="admin-summary-grid">
-        {adminStatusConfigs.map((status) => (
-          <DashboardCard
-            key={status.label}
-            config={status}
-            value={summary[status.label] ?? 0}
-            isActive={activeStatus === status.label}
-            onClick={() => {
-              setPage(1)
-              setActiveStatus((currentStatus) => (currentStatus === status.label ? null : status.label))
-            }}
-          />
-        ))}
-      </div>
+      <StatusFilterBar
+        options={adminStatusConfigs}
+        counts={summary}
+        total={rows.length}
+        activeStatus={activeStatus}
+        onChange={(status) => {
+          setPage(1)
+          setActiveStatus(status)
+        }}
+      />
 
       <div className="admin-toolbar">
         <label className="search-field">
@@ -1052,7 +1050,7 @@ export function AdminPortal() {
           />
         </label>
         <div className="admin-filter-state">
-          <span>{activeStatus ? `Filter status: ${activeStatus}` : 'Semua status'}</span>
+          <span>{activeStatus ? `Filter status: ${activeStatus}` : ''}</span>
           {activeStatus || search ? (
             <button
               type="button"
@@ -1190,37 +1188,6 @@ function ToastStack({
         </div>
       ))}
     </div>
-  )
-}
-
-function DashboardCard({
-  config,
-  value,
-  isActive,
-  onClick,
-}: {
-  config: AdminStatusConfig
-  value: number
-  isActive: boolean
-  onClick: () => void
-}) {
-  const Icon = config.icon
-
-  return (
-    <button
-      type="button"
-      className={`admin-summary-card admin-summary-card-${config.tone} ${
-        isActive ? 'admin-summary-card-active' : ''
-      }`}
-      onClick={onClick}
-      aria-pressed={isActive}
-    >
-      <span className="admin-summary-icon" aria-hidden="true">
-        <Icon size={22} strokeWidth={2.2} />
-      </span>
-      <span>{config.label}</span>
-      <strong>{value}</strong>
-    </button>
   )
 }
 
@@ -2065,12 +2032,9 @@ function ApprovalRouting({
 
   return (
     <div className="approval-routing-panel">
-      <div className="participant-detail-header">
-        <div>
-          <h4>Approval Routing</h4>
-          <p>Pilih approver, lalu atur urutan approval dari preview.</p>
-        </div>
-      </div>
+      <p className="approval-routing-hint">
+        Pilih approver di kiri, lalu seret kartu di kanan untuk mengatur urutan persetujuan.
+      </p>
 
       {error ? <div className="detail-empty-state detail-error-state">{error}</div> : null}
 
@@ -2120,6 +2084,7 @@ function ApprovalRouting({
                   <strong>{approver.name}</strong>
                   <small>{approver.jobTitle || approver.email}</small>
                 </div>
+                <GripVertical className="approval-preview-grip" size={16} strokeWidth={2} aria-hidden="true" />
               </div>
             ))
           )}

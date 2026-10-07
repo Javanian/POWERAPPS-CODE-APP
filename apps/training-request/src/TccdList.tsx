@@ -16,6 +16,7 @@ import {
   X,
   XCircle,
 } from 'lucide-react'
+import { StatusFilterBar } from './StatusFilterBar'
 import { ApprovalFlowTCCDService, TCCDPARTICIPANTSService, TCCDService } from './generated'
 import type { ApprovalFlowTCCDRead } from './generated/models/ApprovalFlowTCCDModel'
 import type { TCCDPARTICIPANTSRead } from './generated/models/TCCDPARTICIPANTSModel'
@@ -415,20 +416,16 @@ export function TccdList() {
         </div>
       </div>
 
-      <div className="admin-summary-grid">
-        {statusConfigs.map((status) => (
-          <DashboardCard
-            key={status.label}
-            config={status}
-            value={summary[status.label] ?? 0}
-            isActive={activeStatus === status.label}
-            onClick={() => {
-              setPage(1)
-              setActiveStatus((currentStatus) => (currentStatus === status.label ? null : status.label))
-            }}
-          />
-        ))}
-      </div>
+      <StatusFilterBar
+        options={statusConfigs}
+        counts={summary}
+        total={rows.length}
+        activeStatus={activeStatus}
+        onChange={(status) => {
+          setPage(1)
+          setActiveStatus(status)
+        }}
+      />
 
       <div className="admin-toolbar">
         <label className="search-field">
@@ -594,37 +591,6 @@ export function TccdList() {
         />
       ) : null}
     </section>
-  )
-}
-
-function DashboardCard({
-  config,
-  value,
-  isActive,
-  onClick,
-}: {
-  config: StatusConfig
-  value: number
-  isActive: boolean
-  onClick: () => void
-}) {
-  const Icon = config.icon
-
-  return (
-    <button
-      type="button"
-      className={`admin-summary-card admin-summary-card-${config.tone} ${
-        isActive ? 'admin-summary-card-active' : ''
-      }`}
-      onClick={onClick}
-      aria-pressed={isActive}
-    >
-      <span className="admin-summary-icon" aria-hidden="true">
-        <Icon size={22} strokeWidth={2.2} />
-      </span>
-      <span>{config.label}</span>
-      <strong>{value}</strong>
-    </button>
   )
 }
 
