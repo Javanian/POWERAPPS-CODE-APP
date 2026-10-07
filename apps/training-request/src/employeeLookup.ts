@@ -29,7 +29,7 @@ export type EmployeeLookupData = {
 
 let cachedLookup: EmployeeLookupData | null = null
 
-export async function loadEmployeeLookup(_signal?: AbortSignal): Promise<EmployeeLookupData> {
+export async function loadEmployeeLookup(): Promise<EmployeeLookupData> {
   if (cachedLookup) {
     return cachedLookup
   }
