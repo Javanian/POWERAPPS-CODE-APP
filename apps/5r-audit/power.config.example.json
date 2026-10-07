@@ -1,0 +1,53 @@
+{
+  "version": "1.0",
+  "appId": "00000000-0000-4000-8000-000000000400",
+  "appDisplayName": "5R Audit",
+  "region": "prod",
+  "environmentId": "00000000-0000-4000-8000-000000000194",
+  "description": "5R workplace audit with photo evidence and corrective-action follow-up.",
+  "buildPath": "./dist",
+  "buildEntryPoint": "index.html",
+  "localAppUrl": "http://localhost:3000",
+  "logoPath": "Default",
+  "connectionReferences": {
+    "00000000-0000-4000-8000-000000000209": {
+      "id": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+      "displayName": "SharePoint",
+      "dataSources": [
+        "5r new apps",
+        "_5rnewapps"
+      ],
+      "dataSets": {
+        "https://example.sharepoint.com/sites/learning": {
+          "dataSources": {}
+        },
+        "https://example.sharepoint.com/sites/workplace-audit": {
+          "dataSources": {
+            "5r new apps": {
+              "tableName": "00000000-0000-4000-8000-000000000014"
+            },
+            "_5rnewapps": {
+              "tableName": "00000000-0000-4000-8000-000000000014"
+            }
+          }
+        }
+      }
+    },
+    "00000000-0000-4000-8000-000000000551": {
+      "id": "/providers/Microsoft.PowerApps/apis/shared_logicflows",
+      "displayName": "Logic flows",
+      "dataSources": [
+        "_5raddimage"
+      ],
+      "workflowDetails": {
+        "workflowEntityId": "00000000-0000-4000-8000-000000000440",
+        "workflowDisplayName": "5R add image",
+        "workflowName": "00000000-0000-4000-8000-000000000300",
+        "dependencies": {
+          "shared_sharepointonline": "00000000-0000-4000-8000-000000000209"
+        }
+      }
+    }
+  },
+  "databaseReferences": {}
+}
