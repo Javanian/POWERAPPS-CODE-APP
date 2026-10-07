@@ -1,7 +1,8 @@
 import './landing.css'
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react'
 import { ChevronRight } from 'lucide-react'
-import { rootClassName, TopBar, type ThemeProps } from './LandingPage'
+import { TopBar } from './LandingPage'
+import { rootClassName, type ThemeProps } from './theme'
 import {
   getAreaAuditData,
   getCurrentAuditor,
@@ -47,28 +48,34 @@ export function AuditSetupPage({ theme, onToggleTheme, onBack, onSubmit }: Audit
   const [tanggalPelaksanaan, setTanggalPelaksanaan] = useState(todayLocalIso())
   const [area5R, setArea5R] = useState('')
 
-  const loadOptions = useCallback(async () => {
-    setIsLoading(true)
-    setLoadError(null)
-
-    try {
-      const [auditor, areas] = await Promise.all([
+  const fetchOptions = useCallback(
+    () =>
+      Promise.all([
         withPowerAppsTimeout(getCurrentAuditor(), 30000),
         withPowerAppsTimeout(getAreaAuditData(), 30000),
       ])
-
-      setCurrentAuditor(auditor)
-      setAreaData(areas)
-    } catch (err) {
-      setLoadError(err instanceof Error ? err.message : String(err))
-    } finally {
-      setIsLoading(false)
-    }
-  }, [])
+        .then(([auditor, areas]) => {
+          setCurrentAuditor(auditor)
+          setAreaData(areas)
+        })
+        .catch((err: unknown) => {
+          setLoadError(err instanceof Error ? err.message : String(err))
+        })
+        .finally(() => {
+          setIsLoading(false)
+        }),
+    [],
+  )
 
   useEffect(() => {
-    void loadOptions()
-  }, [loadOptions])
+    void fetchOptions()
+  }, [fetchOptions])
+
+  function retryLoad() {
+    setIsLoading(true)
+    setLoadError(null)
+    void fetchOptions()
+  }
 
   const plantOptions = useMemo(() => {
     if (!areaData) {
@@ -133,7 +140,7 @@ export function AuditSetupPage({ theme, onToggleTheme, onBack, onSubmit }: Audit
           {loadError ? (
             <div className="lp-alert" role="alert">
               <span>{loadError}</span>
-              <button type="button" className="lp-btn-back" onClick={() => void loadOptions()}>
+              <button type="button" className="lp-btn-back" onClick={retryLoad}>
                 Coba lagi
               </button>
             </div>
