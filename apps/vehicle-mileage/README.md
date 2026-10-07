@@ -8,6 +8,7 @@ The frontend uses React, TypeScript, React Router and Tailwind CSS. Typed Power 
 
 - `src/pages/kilometer-form.tsx` contains the entry and reporting screens.
 - `src/services/kilometer-service.ts` wraps list queries and record creation.
+- `src/providers` contains the Power Apps initialization gate, theme, toast and query providers.
 - `src/generated` contains connector models and services.
 
 ## Development

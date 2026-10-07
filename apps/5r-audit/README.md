@@ -10,6 +10,7 @@ The main flow is setup, audit entry, then follow-up list and detail. Follow-up s
 - `src/auditSetupData.ts` loads the area master and audit setup data.
 - `src/followUpData.ts` handles follow-up queries and updates.
 - `src/imagePrep.ts` validates, compresses and creates previews of images.
+- `src/theme.ts` holds the shared light/dark theme helpers.
 - `src/evidenceImageColumn.ts` uploads evidence through a flow and writes image-column values through connector-backed HTTP operations.
 
 ## Development
