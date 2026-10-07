@@ -24,6 +24,7 @@ jobs:
           - training-request
           - vehicle-mileage
           - unblock-material
+          - overtime-request
     defaults:
       run:
         working-directory: apps/${{ matrix.app }}
@@ -38,5 +39,7 @@ jobs:
         run: npm ci
       - name: Lint
         run: npm run lint
+      - name: Unit tests
+        run: npm run test --if-present
       - name: Type-check and build
         run: npm run build

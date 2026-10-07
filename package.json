@@ -10,6 +10,7 @@
   "scripts": {
     "install:all": "node scripts/run-all.mjs ci",
     "lint": "node scripts/run-all.mjs lint",
-    "build": "node scripts/run-all.mjs build"
+    "build": "node scripts/run-all.mjs build",
+    "test": "node scripts/run-all.mjs test"
   }
 }

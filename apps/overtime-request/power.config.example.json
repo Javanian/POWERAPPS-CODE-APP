@@ -1,0 +1,28 @@
+{
+  "version": "1.0",
+  "appId": "00000000-0000-4000-8000-000000000700",
+  "appDisplayName": "Overtime Request",
+  "region": "prod",
+  "environmentId": "00000000-0000-4000-8000-000000000194",
+  "description": "Digital overtime order (SPL): request, approval and payroll recap.",
+  "buildPath": "./dist",
+  "buildEntryPoint": "index.html",
+  "localAppUrl": "http://localhost:3000",
+  "logoPath": "Default",
+  "connectionReferences": {
+    "00000000-0000-4000-8000-000000000703": {
+      "id": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+      "displayName": "SharePoint",
+      "dataSources": ["overtime request", "overtime employee"],
+      "dataSets": {
+        "https://example.sharepoint.com/sites/hr": {
+          "dataSources": {
+            "overtime request": { "tableName": "00000000-0000-4000-8000-000000000701" },
+            "overtime employee": { "tableName": "00000000-0000-4000-8000-000000000702" }
+          }
+        }
+      }
+    }
+  },
+  "databaseReferences": {}
+}
