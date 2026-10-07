@@ -4,7 +4,7 @@
 
 :root {
   color-scheme: light;
-  --um-page-bg: #f3f6fb;
+  --um-page-bg: #f7f8fa;
 
   --deep-twilight: #03045e;
   --french-blue: #023e8a;
@@ -19,7 +19,7 @@
 
 .dark {
   color-scheme: dark;
-  --um-page-bg: #0b1322;
+  --um-page-bg: #0b1017;
 }
 
 * {
