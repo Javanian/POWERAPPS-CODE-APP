@@ -14,7 +14,7 @@ if (location.pathname.endsWith("/index.html")) {
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <Layout showHeader={false} />,
+    element: <Layout />,
     errorElement: <NotFoundPage />,
     children: [
       { index: true, element: <HomePage /> },

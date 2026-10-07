@@ -3,9 +3,9 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 import { format } from "date-fns"
 import { id } from "date-fns/locale"
-import { useNavigate, useSearchParams } from "react-router-dom"
+import { useSearchParams } from "react-router-dom"
 import {
-  CalendarIcon, Plus, Loader2, Car, ArrowLeft,
+  CalendarIcon, Plus, Loader2, Car,
   Search, Pencil, ListFilter, X, AlertCircle, CheckCircle2, Clock,
 } from "lucide-react"
 
@@ -18,7 +18,7 @@ import { Label } from "@/components/ui/label"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Tabs, TabsContent } from "@/components/ui/tabs"
 import { cn } from "@/lib/utils"
 
 import {
@@ -146,10 +146,11 @@ function calcDistance(awal?: number, akhir?: number): number | null {
 }
 
 export default function KilometerFormPage() {
-  const navigate = useNavigate()
-  const [searchParams] = useSearchParams()
+  const [searchParams, setSearchParams] = useSearchParams()
   const queryClient = useQueryClient()
-  const [activeTab, setActiveTab] = useState(searchParams.get("tab") === "report" ? "report" : "input")
+  // The tab lives in the URL so header links and the browser back button switch it.
+  const activeTab = searchParams.get("tab") === "report" ? "report" : "input"
+  const setActiveTab = (tab: string) => setSearchParams(tab === "report" ? { tab: "report" } : {}, { replace: true })
 
   const [form, setForm] = useState<KilometerFormData>({ ...INITIAL_FORM })
   const [dateBerangkatOpen, setDateBerangkatOpen] = useState(false)
@@ -305,26 +306,19 @@ export default function KilometerFormPage() {
   }
 
   return (
-    <div className="p-6 space-y-6">
-      <button
-        onClick={() => navigate("/")}
-        className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
-      >
-        <ArrowLeft className="mr-1 h-4 w-4" />
-        Kembali
-      </button>
+    <div className="px-4 py-8 sm:px-6 space-y-6">
+      <div className="space-y-1">
+        <h1 className="text-2xl font-semibold tracking-tight">
+          {activeTab === "report" ? "Laporan perjalanan" : "Input kilometer"}
+        </h1>
+        <p className="text-sm text-muted-foreground">
+          {activeTab === "report"
+            ? "Cari perjalanan dan lengkapi kilometer kendaraan yang belum kembali."
+            : "Isi data keberangkatan sekarang, lalu lengkapi kilometer saat kendaraan kembali."}
+        </p>
+      </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full max-w-xs grid-cols-2">
-          <TabsTrigger value="input">
-            <Plus className="mr-2 h-4 w-4" />
-            Input Baru
-          </TabsTrigger>
-          <TabsTrigger value="report">
-            <ListFilter className="mr-2 h-4 w-4" />
-            Laporan
-          </TabsTrigger>
-        </TabsList>
 
         <TabsContent value="input" className="mt-4 space-y-6">
           <Card>
