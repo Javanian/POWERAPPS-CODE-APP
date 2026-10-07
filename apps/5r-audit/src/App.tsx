@@ -1,6 +1,7 @@
 import './App.css'
 import { useCallback, useEffect, useRef, useState, type ReactElement } from 'react'
-import { LandingPage, type Theme } from './LandingPage'
+import { LandingPage } from './LandingPage'
+import type { Theme } from './theme'
 import { AuditSetupPage, type AuditSetup } from './AuditSetupPage'
 import { AuditFormPage } from './AuditFormPage'
 import { FollowUpListPage } from './FollowUpListPage'
@@ -161,6 +162,7 @@ function App() {
   } else if (view === 'followup-detail' && followUpRecord) {
     page = (
       <FollowUpDetailPage
+        key={followUpRecord.id}
         record={followUpRecord}
         theme={theme}
         onToggleTheme={toggleTheme}

@@ -1,15 +1,9 @@
 import './landing.css'
 import { ChevronRight, ClipboardCheck, ListChecks, Moon, ShieldCheck, Sun } from 'lucide-react'
 import gearLogo from './asset/5r-wheel.svg'
+import { rootClassName, type ThemeProps } from './theme'
 
 const pillars = ['Ringkas', 'Rapi', 'Resik', 'Rawat', 'Rajin']
-
-export type Theme = 'light' | 'dark'
-
-export type ThemeProps = {
-  theme: Theme
-  onToggleTheme: () => void
-}
 
 export function TopBar({ theme, onToggleTheme }: ThemeProps) {
   return (
@@ -31,10 +25,6 @@ export function TopBar({ theme, onToggleTheme }: ThemeProps) {
       </div>
     </header>
   )
-}
-
-export function rootClassName(theme: Theme) {
-  return theme === 'light' ? 'lp-root lp-light' : 'lp-root'
 }
 
 type LandingPageProps = ThemeProps & {

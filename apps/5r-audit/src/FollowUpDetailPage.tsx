@@ -2,7 +2,7 @@ import './audit.css'
 import './followup.css'
 import { useEffect, useMemo, useState } from 'react'
 import { ArrowLeft, Camera, CheckCircle2, ExternalLink, ImageOff, Moon, Sun, X } from 'lucide-react'
-import { rootClassName, type Theme } from './LandingPage'
+import { rootClassName, type Theme } from './theme'
 import { AUDIT_CATEGORIES, type AuditCategoryDef } from './auditFormConfig'
 import {
   FOLLOWUP_STATUS_OPTIONS,
@@ -11,7 +11,7 @@ import {
   type FollowUpItemState,
   type FollowUpRecord,
 } from './followUpData'
-import { validateImage } from './imagePrep'
+import { makePreviewObjectUrl, validateImage } from './imagePrep'
 import { getPowerAppsErrorMessage, withPowerAppsTimeout } from './powerAppsData'
 
 type FollowUpDetailPageProps = {
@@ -77,8 +77,6 @@ export function FollowUpDetailPage({ record, theme, onToggleTheme, onBack }: Fol
 
   useEffect(() => {
     let cancelled = false
-    setIsLoading(true)
-    setLoadError('')
 
     void withPowerAppsTimeout(getFollowUpDetail(record.id), 30000)
       .then((detail) => {
@@ -449,16 +447,33 @@ function AfterPhotoPicker({
   onChange: (file: File | null) => void
 }) {
   const [pickError, setPickError] = useState<string | null>(null)
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [preview, setPreview] = useState<{ file: File; url: string } | null>(null)
+  const previewUrl = file && preview?.file === file ? preview.url : null
 
+  // Preview di-downscale async — hindari decode foto full-res di main thread.
   useEffect(() => {
-    if (!file) {
-      setPreviewUrl(null)
-      return
+    if (!file) return
+
+    let cancelled = false
+    let createdUrl: string | null = null
+
+    makePreviewObjectUrl(file)
+      .then((url) => {
+        if (cancelled) {
+          URL.revokeObjectURL(url)
+          return
+        }
+        createdUrl = url
+        setPreview({ file, url })
+      })
+      .catch(() => {
+        // Preview gagal dibuat: tampilkan placeholder tanpa gambar.
+      })
+
+    return () => {
+      cancelled = true
+      if (createdUrl) URL.revokeObjectURL(createdUrl)
     }
-    const url = URL.createObjectURL(file)
-    setPreviewUrl(url)
-    return () => URL.revokeObjectURL(url)
   }, [file])
 
   const inputId = `after-${itemId}`
