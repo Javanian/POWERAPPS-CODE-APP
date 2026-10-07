@@ -15,13 +15,23 @@ Four business workflow applications built as **Microsoft Power Apps code apps** 
 
 Captured from production builds of each app with the Power Apps SDK replaced by sample data. All names and records are fictional.
 
+### TCCD Training Request
+
+Multi-level approval: admins pick approvers and drag them into order, then every decision is tracked with its date and comment.
+
+| Approval routing | Approval progress |
+| --- | --- |
+| ![TCCD approval routing: pick and order approvers](docs/screenshots/training-request-approval-routing.jpg) | ![TCCD approval progress timeline](docs/screenshots/training-request-approval-progress.jpg) |
+
+![TCCD request list with status filter](docs/screenshots/training-request-list.jpg)
+
+### Other applications
+
 | 5R Audit | 5R Audit: follow-up |
 | --- | --- |
 | ![5R Audit landing page](docs/screenshots/5r-audit-landing.jpg) | ![5R Audit follow-up list](docs/screenshots/5r-audit-follow-up.jpg) |
-| **TCCD Training Request** | **Vehicle Mileage** |
-| ![TCCD training request list](docs/screenshots/training-request-list.jpg) | ![Vehicle Mileage report](docs/screenshots/vehicle-mileage-report.jpg) |
-| **Unblock Material** | |
-| ![Unblock Material ticket browser](docs/screenshots/unblock-material-tickets.jpg) | |
+| **Vehicle Mileage** | **Unblock Material** |
+| ![Vehicle Mileage report](docs/screenshots/vehicle-mileage-report.jpg) | ![Unblock Material ticket browser](docs/screenshots/unblock-material-tickets.jpg) |
 
 ## Architecture
 
